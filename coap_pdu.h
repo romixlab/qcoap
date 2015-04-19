@@ -2,7 +2,8 @@
 #define COAP_PDU_H
 
 #include <QtGlobal>
-#include "cantcoap.h"
+
+class CoapPDU;
 
 namespace qcoap {
 

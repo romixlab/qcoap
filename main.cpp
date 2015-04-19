@@ -2,14 +2,18 @@
 #include "coap.h"
 #include "coap_pdu.h"
 
+#include <QDebug>
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
 //    qcoap::Coap coap;
 
-    qcoap::PDU::Type t = qcoap::PDU::Type::CONFIRMABLE;
-    quint8 val = static_cast<quint8>(t);
+    qcoap::PDU pdu;
+    pdu.setVersion(0);
+    qcoap::PDU pducopy(pdu);
+    qDebug() << pducopy.version();
 
     return a.exec();
 }
