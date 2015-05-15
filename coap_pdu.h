@@ -3,11 +3,9 @@
 
 #include <QtGlobal>
 
-class CoapPDU;
+struct CoapPDUPrivate;
 
-namespace qcoap {
-
-class PDU
+class CoapPDU
 {
 public:
     enum class Type : quint8 {
@@ -47,7 +45,7 @@ public:
     UNDEFINED_CODE             = 0xff
     };
 
-    enum class Option : quint8 {
+    enum class Option : quint16 {
     IF_MATCH                   = 1,
     URI_HOST                   = 3,
     ETAG                       = 4,
@@ -69,7 +67,7 @@ public:
     SIZE1                      = 60
     };
 
-    enum class ContentFormat : quint8 {
+    enum class ContentFormat : quint16 {
     TEXT_PLAIN                 = 0,
     APP_LINK                   = 40,
     APP_XML                    = 41,
@@ -78,37 +76,62 @@ public:
     APP_JSON                   = 50
     };
 
-    PDU();
-    PDU(const QByteArray &array);
-    PDU(const PDU &other);
-    ~PDU();
+    enum class Error {
+        FORMAT_ERROR            = 1,
+        UNKNOWN_VERSION         = 2,
+        WRONG_TOKEN_LENGTH      = 4,
+        WRONG_PAYLOAD_MARKER    = 8,
+        WRONG_OPTION_HEADER     = 16,
+        NOT_ENOUGH_DATA         = 32,
+        WRONG_VERSION           = 64,
+        WRONG_TOKEN             = 128,
 
-    bool setVersion(quint8 version);
+
+    };
+    Q_DECLARE_FLAGS(Errors, Error)
+
+    CoapPDU();
+    CoapPDU(const QByteArray &array);
+    CoapPDU(const CoapPDU &other);
+    ~CoapPDU();
+
+    void setVersion(quint8 version);
     quint8 version() const;
 
     void setType(Type type);
     Type type() const;
 
-    bool setToken(const QByteArray &token);
+    void setToken(const QByteArray &token);
+    void setToken(const char *token, quint8 length);
     QByteArray token() const;
 
-    bool setMessageId(quint16 id);
+    void setMessageId(quint16 id);
     quint16 messageId() const;
 
-    bool addOption(quint16 optionNumber, const QByteArray &value);
+    void addOption(quint16 optionNumber, const QByteArray &value);
     QList<QByteArray> options() const;
-    bool setUri(const QString &uri);
+    void setUri(const QString &uri);
     QString uri() const;
 
-    bool setContentFormat(ContentFormat format);
+    void setContentFormat(ContentFormat format);
 
-    bool setPayload(const QByteArray &payload);
+    void setPayload(const QByteArray &payload);
     QByteArray payload() const;
 
+    QByteArray pack() const;
+    void unpack(const QByteArray &packed);
+
+    CoapPDU::Errors errors() const;
+    bool isValid() const;
+
+protected:
+    CoapPDUPrivate *d_ptr;
 private:
-    CoapPDU *p;
+    void detach();
+    quint8 *pack_option(quint8 *p, quint16 optionNumber, const QByteArray &value, bool write) const;
+    Q_DECLARE_PRIVATE(CoapPDU)
 };
 
-} // qcoap
+Q_DECLARE_OPERATORS_FOR_FLAGS(CoapPDU::Errors)
 
 #endif // COAP_PDU_H

@@ -16,13 +16,10 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    cantcoap.cpp \
-    coap.cpp \
-    coap_pdu.cpp
+    coap_pdu.cpp \
+    coapnode.cpp
 
 HEADERS += \
-    cantcoap.h \
-    dbg.h \
-    coap.h \
-    coap_private.h \
-    coap_pdu.h
+    coap_pdu.h \
+    sysdep.h \
+    coapnode.h
