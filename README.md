@@ -2,6 +2,7 @@
 CoAP for Qt
 
 Now it's a work in progress! only PDU encoding and decoding are supported (and untested yet)
+
 Plans are:
 * PDU encoding/decoding with custom options and content format support
 * CoapNode class which well be talking to one remote CoAP node, work with sockets, 
