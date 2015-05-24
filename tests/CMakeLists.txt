@@ -1,0 +1,25 @@
+if (Qt5Core_FOUND)
+	find_package(Qt5Test REQUIRED)
+
+	include_directories(${Qt5Test_INCLUDE_DIRS})
+	add_definitions(${Qt5Test_DEFINITIONS})
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Test_EXECUTABLE_COMPILE_FLAGS}")
+
+	set(TEST_LIBRARIES ${Qt5Test_LIBRARIES})
+endif ()
+
+MACRO(SUBDIRLIST result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+        LIST(APPEND dirlist ${child})
+    ENDIF()
+  ENDFOREACH()
+  SET(${result} ${dirlist})
+ENDMACRO()
+
+SUBDIRLIST(SUBDIRS ${CMAKE_CURRENT_LIST_DIR})
+FOREACH(subdir ${SUBDIRS})
+    ADD_SUBDIRECTORY(${subdir})
+ENDFOREACH()
