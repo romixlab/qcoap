@@ -7,7 +7,7 @@ before_install:
  - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
  - sudo add-apt-repository --yes ppa:kalakris/cmake
  - sudo apt-get update -qq
- - sudo apt-get install -qq cmake libqt5core5 libqt5network5 qt5-qmake qt5-default qtchooser libcoap-dev
+ - sudo apt-get install -qq cmake libqt5core5 libqt5network5 qt5-qmake qt5-default qtchooser
 
 script:
  - mkdir build
