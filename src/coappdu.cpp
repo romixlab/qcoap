@@ -4,6 +4,26 @@
 
 #include <QDebug>
 
+CoapOption::CoapOption() {}
+CoapOption::CoapOption(quint16 number, const QByteArray &data):
+    m_number(number), m_data(data)
+{}
+
+quint16 CoapOption::number() const
+{
+    return m_number;
+}
+
+QByteArray CoapOption::data() const
+{
+    return m_data;
+}
+
+bool CoapOption::operator ==(const CoapOption &other)
+{
+    return (m_number == other.m_number) && (m_data == other.m_data);
+}
+
 struct CoapPDUPrivate {
     QAtomicInt ref;
 
@@ -12,7 +32,7 @@ struct CoapPDUPrivate {
     CoapPDU::Code code;
     quint16 message_id;
     QByteArray token;
-    QList<QPair<quint16, QByteArray> > options;
+    QList<CoapOption> options;
     QByteArray payload;
 
     CoapPDU::Errors errors;
@@ -150,27 +170,20 @@ void CoapPDU::addOption(quint16 optionNumber, const QByteArray &value)
     Q_D(CoapPDU);
     int idx = 0;
     for (int i = 0; i < d->options.length(); ++i) {
-        if (optionNumber > d->options[i].first)
+        if (optionNumber > d->options[i].number())
             idx++;
     }
-    QPair<quint16, QByteArray> option;
-    option.first = optionNumber;
-    option.second = value;
+    CoapOption option(optionNumber, value);
     if (d->options.contains(option))
         return;
     detach();
     d->options.insert(idx, option);
 }
 
-QList<QByteArray> CoapPDU::options() const
+QList<CoapOption> CoapPDU::options() const
 {
     Q_D(const CoapPDU);
-    qDebug() << "options len" << d->options.length();
-    for (int i = 0; i < d->options.length(); ++i) {
-        qDebug() << "option number" << d->options[i].first;
-        qDebug() << "option data" << d->options[i].second.toHex();
-    }
-    return QList<QByteArray>();
+    return d->options;
 }
 
 void CoapPDU::setContentFormat(CoapPDU::ContentFormat format)
@@ -254,8 +267,8 @@ QByteArray CoapPDU::pack() const
     quint8 *p = 0;
     quint16 optionDelta = 0;
     for (int i = 0; i < d->options.length(); ++i) {
-        quint16 optionNumber = d->options[i].first - optionDelta;
-        p = pack_option(p, optionNumber, d->options[i].second, false);
+        quint16 optionNumber = d->options[i].number() - optionDelta;
+        p = pack_option(p, optionNumber, d->options[i].data(), false);
         optionDelta = optionNumber;
     }
     pduSize += p - (quint8 *)0;
@@ -280,8 +293,8 @@ QByteArray CoapPDU::pack() const
     p += d->token.length();
     optionDelta = 0;
     for (int i = 0; i < d->options.length(); ++i) {
-        quint16 optionNumber = d->options[i].first - optionDelta;
-        p = pack_option(p, optionNumber, d->options[i].second, true);
+        quint16 optionNumber = d->options[i].number() - optionDelta;
+        p = pack_option(p, optionNumber, d->options[i].data(), true);
         optionDelta = optionNumber;
     }
     *(p++) = 0xff;
@@ -303,12 +316,12 @@ void CoapPDU::unpack(const QByteArray &packed)
         return;
     }
 
-    d->version = (*p & 0xc0) >> 6;
+    d->version = (p[0] & 0xc0) >> 6;
     if (d->version != 1)
         d->errors |= Error::UNKNOWN_VERSION;
 
-    d->type = (Type)( (*p & 0x30) >> 4 );
-    quint8 tokenLength = (*p & 0xf);
+    d->type = (Type)( (p[0] & 0x30) >> 4 );
+    quint8 tokenLength = (p[0] & 0xf);
     d->code = (Code)p[1];
     if (tokenLength > 8)
         d->errors |= Error::WRONG_TOKEN_LENGTH;
@@ -322,8 +335,7 @@ void CoapPDU::unpack(const QByteArray &packed)
 
     p += tokenLength;
     p += 4;
-//    qDebug() << "pos" << p - (quint8*)packed.data();
-//    qDebug() << "at pos" << quint8(*p);
+
     quint16 optionNumber = 0;
     do {
         if (*p == 0xff) {
@@ -363,9 +375,7 @@ void CoapPDU::unpack(const QByteArray &packed)
         }
 
         optionNumber += optionDelta;
-        QPair<quint16, QByteArray> option;
-        option.first = optionNumber;
-        option.second = QByteArray((const char *)p, optionLength);
+        CoapOption option(optionNumber, QByteArray((const char *)p, optionLength));
         d->options.append(option);
         p += optionLength;
     } while (p <= pend);

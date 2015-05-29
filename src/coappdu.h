@@ -2,8 +2,23 @@
 #define COAP_PDU_H
 
 #include <QtGlobal>
+#include <QByteArray>
 
 struct CoapPDUPrivate;
+
+class CoapOption {
+public:
+    CoapOption();
+    CoapOption(quint16 number, const QByteArray &data);
+
+    quint16 number() const;
+    QByteArray data() const;
+
+    bool operator ==(const CoapOption &other);
+private:
+    quint16 m_number;
+    QByteArray m_data;
+};
 
 class CoapPDU
 {
@@ -112,7 +127,7 @@ public:
     quint16 messageId() const;
 
     void addOption(quint16 optionNumber, const QByteArray &value);
-    QList<QByteArray> options() const;
+    QList<CoapOption> options() const;
     void setUri(const QString &uri);
     QString uri() const;
 

@@ -32,7 +32,7 @@ void CoapNode::readPending()
         qDebug() << (quint8)pdu.type();
         qDebug() << pdu.token();
         qDebug() << pdu.messageId();
-        qDebug() << pdu.options();
+       // qDebug() << pdu.options();
         qDebug() << pdu.payload();
 
     }

@@ -14,19 +14,22 @@ void CopperTest::test_get()
 {
     CoapPDU pdu;
 
-    QByteArray simpleGet = QByteArray::fromHex("42013fd5a4feb474657374c102");
+    QByteArray simpleGet = QByteArray::fromHex("40016633b474657374c102");
     QByteArray token;
+    QList<CoapOption> options;
 
     pdu.unpack(simpleGet);
-    qDebug() << pdu.errors();
     QVERIFY(pdu.isValid());
     QVERIFY(pdu.version() == 1);
     QVERIFY(pdu.type() == CoapPDU::Type::CONFIRMABLE);
     QVERIFY(pdu.code() == CoapPDU::Code::GET);
-    QVERIFY(pdu.messageId() == 16341);
-    token = pdu.token();
-    QVERIFY((quint8)token.data()[0] == 0xa4);
-    QVERIFY((quint8)token.data()[1] == 0xfe);
+    QVERIFY(pdu.messageId() == 26163);
+    QVERIFY(pdu.token().size() == 0);
+    options = pdu.options();
+    QVERIFY(options[0].number() == (quint16)CoapPDU::Option::URI_PATH);
+    QVERIFY(options[0].data() == "test");
+    QVERIFY(options[1].number() == (quint16)CoapPDU::Option::BLOCK2);
+    QVERIFY(options[1].data() == "\02");
 }
 
 QTEST_APPLESS_MAIN(CopperTest)
