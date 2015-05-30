@@ -115,6 +115,15 @@ CoapPDU::Type CoapPDU::type() const
     return d->type;
 }
 
+void CoapPDU::setCode(CoapPDU::Code code)
+{
+    Q_D(CoapPDU);
+    if (d->code == code)
+        return;
+    detach();
+    d->code = code;
+}
+
 CoapPDU::Code CoapPDU::code() const
 {
     Q_D(const CoapPDU);

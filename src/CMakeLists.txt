@@ -1,5 +1,5 @@
-set(qcoap_srcs coappdu.cpp coapnode.cpp)
-set(qcoap_headers coappdu.h coapnode.h)
+set(qcoap_srcs coappdu.cpp coapnode.cpp coapbridge.cpp)
+set(qcoap_headers coap_global.h coappdu.h coapnode.h coapbridge.h)
 
 add_library(qcoap SHARED ${qcoap_srcs} ${qcoap_headers})
 
@@ -16,7 +16,7 @@ if (NOT android)
 				       SOVERSION ${QCOAP_MAJOR})
 endif ()
 set_target_properties(qcoap PROPERTIES
-				DEFINE_SYMBOL	QCOAP_MAKE_LIB
+				DEFINE_SYMBOL	COAP_MAKE_LIBRARY
 				PUBLIC_HEADER	"${qcoap_headers}")
 
 install(TARGETS qcoap EXPORT qcoap-export

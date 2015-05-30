@@ -25,9 +25,9 @@ class CoapPDU
 public:
     enum class Type : quint8 {
     CONFIRMABLE                = 0x00,
-    NON_CONFIRMABLE            = 0x10,
-    ACKNOWLEDGEMENT            = 0x20,
-    RESET                      = 0x30
+    NON_CONFIRMABLE            = 0x01,
+    ACKNOWLEDGEMENT            = 0x02,
+    RESET                      = 0x03
     };
 
     enum class Code : quint8 {
