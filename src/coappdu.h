@@ -3,10 +3,10 @@
 
 #include <QtGlobal>
 #include <QByteArray>
+#include "coap_global.h"
 
 struct CoapPDUPrivate;
-
-class CoapOption {
+class COAP_SHARED_EXPORT CoapOption {
 public:
     CoapOption();
     CoapOption(quint16 number, const QByteArray &data);
@@ -20,7 +20,7 @@ private:
     QByteArray m_data;
 };
 
-class CoapPDU
+class COAP_SHARED_EXPORT CoapPDU
 {
 public:
     enum class Type : quint8 {

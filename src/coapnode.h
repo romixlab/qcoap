@@ -7,7 +7,6 @@
 #include "coappdu.h"
 
 class CoapNodePrivate;
-
 class COAP_SHARED_EXPORT CoapNode : public QObject
 {
     Q_OBJECT

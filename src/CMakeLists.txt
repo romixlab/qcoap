@@ -1,4 +1,4 @@
-set(qcoap_srcs coappdu.cpp coapnode.cpp coapbridge.cpp)
+set(qcoap_srcs coappdu.cpp coapnode.cpp coapbridge.cpp dqobject.cpp)
 set(qcoap_headers coap_global.h coappdu.h coapnode.h coapbridge.h)
 
 add_library(qcoap SHARED ${qcoap_srcs} ${qcoap_headers})

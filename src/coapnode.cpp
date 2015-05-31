@@ -18,11 +18,11 @@ void CoapNodePrivate::setup()
     if (!udp->bind(QHostAddress::LocalHost, 5683))
         qWarning() << "Bind failed" << udp->errorString();
     QObject::connect(udp, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
-            q, SLOT(_q_state_changed(QAbstractSocket::SocketState)));
+                     q,   SLOT(_q_state_changed(QAbstractSocket::SocketState)));
     QObject::connect(udp, SIGNAL(readyRead()),
-            q, SLOT(_q_ready_read()));
+                     q,   SLOT(_q_ready_read()));
     QObject::connect(udp, SIGNAL(error(QAbstractSocket::SocketError)),
-            q, SLOT(_q_error(QAbstractSocket::SocketError)));
+                     q,   SLOT(_q_error(QAbstractSocket::SocketError)));
 }
 
 void CoapNodePrivate::_q_state_changed(QAbstractSocket::SocketState state)
