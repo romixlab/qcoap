@@ -7,7 +7,7 @@ Below is a planned features list:
 
 1. Requesting / Settings a resource
   * Blocking call (waitForComplete())
-  ```
+  ```cpp
   CoapEndpoint endpoint;
   endpoint.bind(QHostAddress::Any, CoapEndpoint::Client);
   CoapRequest req("coap://coap.me/test");
@@ -15,20 +15,20 @@ Below is a planned features list:
   req.waitForComplete(5000);
  ```
   * Lambda
-  ```
+  ```cpp
   req.onComplete([](){});
   ```
   * Qt Quick callback function (onComplete(function(){})
-  ```
+  ```cpp
   CoapEndpoint {
-   address: "0.0.0.0"
-   mode: CoapEndpoint.Client
+     address: "0.0.0.0"
+     mode: CoapEndpoint.Client
   }
   Button {
    onClicked: {
-    Coap.Request req("coap://coap.me/test")
-    req.get().onComplete(function() {
-    })
+       Coap.Request req("coap://coap.me/test")
+       req.get().onComplete(function() {
+       })
    }
   }
   ```
