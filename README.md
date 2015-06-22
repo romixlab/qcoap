@@ -5,7 +5,7 @@ Now it's a work in progress!
 
 Below is a planned features list:
 
-1. Requesting / Settings a resource
+1. Requesting / Settings a resource ![](https://img.shields.io/badge/status-working-yellow.svg)
   * Blocking call (waitForComplete())
   ```cpp
   CoapEndpoint endpoint;
