@@ -21,21 +21,34 @@ Below is a planned features list:
   * Qt Quick callback function (onComplete(function(){})
   ```cpp
   CoapEndpoint {
-     address: "0.0.0.0"
-     mode: CoapEndpoint.Client
+      address: "0.0.0.0"
+      mode: CoapEndpoint.Client
   }
   Button {
-   onClicked: {
-       Coap.Request req("coap://coap.me/test")
-       req.get().onComplete(function() {
-       })
-   }
+      onClicked: {
+          Coap.Request req("coap://coap.me/test")
+          req.get().onComplete(function() {
+          })
+      }
   }
   ```
 2. Observing a resource
   * Slot invocation on a resource change
+  ```cpp
+  CoapClient client;
+  client.observe("coap://...", object, SLOT(QString,QPoint))
+  ```
   * Lambda
+  ```cpp
+  client.observe("coap://...", [](){})
+  ```
   * Virtual signal
+  ```cpp
+  client.observe("coap://...", "mysignal(int,int,QString)")
+  connect(client.dq, SIGNAL(mysignal(int,int,QString)),
+          myobject,  SIGNAL(mysignal(int,int,QString)));
+  // dq is DQObject - object for work with dynamic slots, signals, properties
+  ```
 3. Creating a simple resource
   * Publish Q_INVOKABLE method as a resource
   * Publish slot as a resource
