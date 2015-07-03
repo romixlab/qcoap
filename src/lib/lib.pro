@@ -10,7 +10,8 @@ DESTDIR = $$PWD/../../lib
 SOURCES += \
     coap.cpp \
     coapendpoint.cpp \
-    coappdu.cpp
+    coappdu.cpp \
+    coapexchange.cpp
 
 HEADERS += \
     coaplib_global.h \
@@ -18,7 +19,8 @@ HEADERS += \
     coapendpoint_p.h \
     coapendpoint.h \
     coappdu.h \
-    endianhelper.h
+    endianhelper.h \
+    coapexchange.h
 
 unix {
     target.path = /usr/lib

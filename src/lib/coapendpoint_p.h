@@ -23,6 +23,8 @@ public:
     quint16 port;
     QUdpSocket *udp;
 
+    QString name;
+
     CoapEndpoint *q_ptr;
 };
 #endif // COAPENDPOINT_P_H

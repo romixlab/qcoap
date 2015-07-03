@@ -6,6 +6,7 @@
 #include "coaplib_global.h"
 #include "coapendpoint.h"
 #include "coappdu.h"
+#include <QHostAddress>
 
 class CoapEndpointPrivate;
 class COAPLIB_SHARED_EXPORT CoapEndpoint : public QObject
@@ -14,6 +15,14 @@ class COAPLIB_SHARED_EXPORT CoapEndpoint : public QObject
 public:
     explicit CoapEndpoint(const QString &endpointName = QStringLiteral("default"), QObject *parent = 0);
     virtual ~CoapEndpoint();
+
+    enum Type {
+        Client,
+        ClientServer
+    };
+
+    bool bind(const QHostAddress &address, quint16 port = 1024,
+              Type type = Client, quint16 maxAttempts = 100);
 
     virtual void processPDU(const CoapPDU &pdu, const QHostAddress &from, quint16 fromPort);
     void sendPDU(const CoapPDU &pdu, const QHostAddress &to, quint16 toPort);

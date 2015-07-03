@@ -4,6 +4,7 @@
 #include "coaplib_global.h"
 #include <QString>
 
+class CoapEndpoint;
 class COAPLIB_SHARED_EXPORT Coap
 {
 public:
@@ -79,6 +80,11 @@ public:
     APP_JSON                   = 50
     };
     static QString toString(ContentFormat contentFormat);
+
+    static CoapEndpoint *defaultEndpoint();
+    static void addEndpoint(CoapEndpoint *endpoint);
+    static void removeEndpoint(CoapEndpoint *endpoint);
+    static QList<CoapEndpoint *> endpoints();
 
 private:
     Coap();

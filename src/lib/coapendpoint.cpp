@@ -1,4 +1,5 @@
 #include <QUdpSocket>
+#include "coap.h"
 #include "coapendpoint.h"
 #include "coapendpoint_p.h"
 #include "coappdu.h"
@@ -15,25 +16,19 @@ void CoapEndpointPrivate::setup()
     qDebug() << "CoapEndpointPrivate::setup()";
     Q_Q(CoapEndpoint);
     udp = new QUdpSocket(q);
-    if (!udp->bind(QHostAddress::LocalHost, 5683))
-        qWarning() << "Bind failed" << udp->errorString();
     QObject::connect(udp, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
                      q,   SLOT(_q_state_changed(QAbstractSocket::SocketState)));
     QObject::connect(udp, SIGNAL(readyRead()),
                      q,   SLOT(_q_ready_read()));
     QObject::connect(udp, SIGNAL(error(QAbstractSocket::SocketError)),
                      q,   SLOT(_q_error(QAbstractSocket::SocketError)));
+
+    Coap::addEndpoint(q);
 }
 
 void CoapEndpointPrivate::_q_state_changed(QAbstractSocket::SocketState state)
 {
     qDebug() << "new state:" << state;
-    // if (state == QTcpSocket::ConnectedState) {
-    //     write_sentence(QStringList() << "/login");
-    //     this->state = Router::LOGGING_IN;
-    //     Q_Q(Router);
-    //     emit q->stateChanged(this->state);
-    // }
 }
 
 void CoapEndpointPrivate::_q_ready_read()
@@ -56,9 +51,6 @@ void CoapEndpointPrivate::_q_ready_read()
 void CoapEndpointPrivate::_q_error(QAbstractSocket::SocketError error)
 {
     qDebug() << error;
-    // Q_Q(Router);
-    // state = Router::DISCONNECTED;
-    // emit q->stateChanged(state);
 }
 
 
@@ -68,6 +60,7 @@ CoapEndpoint::CoapEndpoint(const QString &endpointName, QObject *parent) :
     qDebug() << "CoapEndpoint::CoapEndpoint(QObject *parent)";
     Q_D(CoapEndpoint);
     d->q_ptr = this;
+    d->name = endpointName;
     d->setup();
 }
 
@@ -88,7 +81,23 @@ CoapEndpoint::~CoapEndpoint()
     }
 }
 
-void CoapEndpoint::processPDU(const CoapPDU &pdu, const QHostAddress &from, quint16 fromPort)
+
+bool CoapEndpoint::bind(const QHostAddress &address, quint16 port, Type type, quint16 maxAttempts)
+{
+    Q_D(CoapEndpoint);
+    if (d->udp->state() != QUdpSocket::UnconnectedState) {
+        qWarning() << "CoapEndpoint::bind(): socket already initialized";
+        return false;
+    }
+    if (type == ClientServer)
+        return d->udp->bind(address, port);
+    for (quint16 i = 0; i < maxAttempts; ++i)
+        if (d->udp->bind(address, port++))
+            return true;
+    return false;
+}
+
+void CoapEndpoint::processPDU(const CoapPDU &pdu, const QHostAddress &from,quint16 fromPort)
 {
     Q_UNUSED(pdu);
     Q_UNUSED(from);
