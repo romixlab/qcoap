@@ -22,7 +22,7 @@ Below is a planned features list:
   exchange.get();
   ```
   * Qt Quick callback function (onComplete(function(){})
-  ```cpp
+  ```qml
   CoapEndpoint {
       address: "0.0.0.0"
       mode: CoapEndpoint.Client
@@ -52,6 +52,13 @@ Below is a planned features list:
           myobject,  SLOT(someslot(int,int,QString))); // types dispatched on the fly
   // dq is DQObject - object for work with dynamic slots, signals, properties
   ```
+  * QML
+  ```qml
+  Component.onCompleted: {
+   CoapExchange exchange;
+   exchange.observe("coap://...").onChanged(function(){})
+  }
+  ```
 3. Creating a simple resource
   * Publish Q_INVOKABLE method or slot as a resource
   ```cpp
@@ -60,13 +67,36 @@ Below is a planned features list:
   // if only get/post/put is needed
   resource.onPut(object, SLOT(status(QString))); // get, post, put supported
   // or make a decision based on request info (source, type, etc)
-  resource.onRequest(object, SLOT(status(QString,RequestInfo))); // get, post, put supported
+  resource.onRequest(object, SLOT(status(QString,CoapExchange))); // get, post, put supported
   ```
   * Custom get/post/put/delete handlers
+  ```cpp
+  CoapResource resource("/custom");
+  resource.onRequest([](CoapExchange *exchange){ /* handle everything */ });
+  ```
+  * QML
+  ```qml
+  Component.onCompleted: {
+   CoapResource resource("/qmlresource");
+   resource.onRequest(function(){})
+  }
+  ```
 4. Creating a resource based on a property
   ```cpp
   CoapResource resource("/lamp");
   resource.bindProperty(object, "lamp"); // get, post, put, observe supported
+  ```
+  * QML
+  ```qml
+  Button {
+   id: startButton
+   checkable: true
+   text: "Start"
+   Component.onCompleted: {
+    CoapResource resource("/start")
+    resource.bindProperty(startButton.checked)
+   }
+  }
   ```
 5. Binding remote resource to local property
   * Simple (only observe remote resource)
@@ -85,6 +115,18 @@ Below is a planned features list:
    // when property will change, put request will be made
    // when resource will change, property will be updated
    // endless loop of setting property-sending put-receiving update-setting property-etc is taken care of
+  ```
+  * QML
+  ```qml
+  Led {
+   id: led
+   Component.onCompleted: {
+    CoapResource resource
+    resource.bindProperty("coap://.../observable", led.on)
+    // or
+    resource.bindProperty("coap://.../observable", led.on, CoapResource.TwoWay)
+   }
+  }
   ```
 6. File transfering
   * Create a resource that accepts incoming files
@@ -164,5 +206,6 @@ Below is a planned features list:
 10. Running many endpoints on one host (CoAP-CoAP proxy)
   If there is more than one multicast listener on one interface, only one of them will receive multicast packets (while everyone can still send them). So transparent CoAP-CoAP proxy is need, that will be launched as a daemon.
 CoapEndpoint in Client mode will check if there is such a proxy and pass every request through it. C/C++ CoAP implementation is more preferable in this case, maybe smcp, libcoap or some other?
-11. HTTP(s)-CoAP proxy (configure existing)
-// in work
+11. HTTPS-CoAP proxy (configure existing)
+Mobile clients that cannot run CoAP can use HTTPS instead (for example Tizen Wearable), appropriate proxy configuration must be provided (with discovery and multicast requests support)
+Certificate provision must be supported.
