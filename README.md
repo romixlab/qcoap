@@ -18,7 +18,7 @@ Below is a planned features list:
   * Lambda
   ```cpp
   exchange.setTimeout(5000);
-  exchange.onComplete([](CoapRequest::Status status, const CoapPDU &answer){});
+  exchange.onComplete([](CoapExchange &exchange){});
   exchange.get();
   ```
   * Qt Quick callback function (onComplete(function(){})
@@ -30,8 +30,10 @@ Below is a planned features list:
   Button {
       onClicked: {
           Coap.Exchange exchange("coap://coap.me/test")
-          exchange.get().onComplete(function(status, answer) {
+          exchange.get().onComplete(function(var exchange) {
           })
+          //or
+      onClicked: Coap.Exchange("coap://coap.me/test").get().onComplete(function(var exchange){})
       }
   }
   ```
@@ -55,7 +57,7 @@ Below is a planned features list:
   * QML
   ```qml
   Component.onCompleted: {
-   CoapExchange exchange;
+   Coap.Exchange exchange;
    exchange.observe("coap://...").onChanged(function(){})
   }
   ```
@@ -77,8 +79,17 @@ Below is a planned features list:
   * QML
   ```qml
   Component.onCompleted: {
-   CoapResource resource("/qmlresource");
+   Coap.Resource resource("/qmlresource");
    resource.onRequest(function(){})
+  }
+  // or
+  CoapResource {
+   path: "/"
+   onRequest: ...
+   CoapResource {
+   path: "/test"
+   bindProperty: someObject.property
+   }
   }
   ```
 4. Creating a resource based on a property
@@ -101,15 +112,15 @@ Below is a planned features list:
 5. Binding remote resource to local property
   * Simple (only observe remote resource)
   ```cpp
-  CoapResource resource("coap://vs0.inf.ethz.ch:5683/obs");
-  resource.bindProperty(object, "lamp");
+  CoapExchange exchange("coap://vs0.inf.ethz.ch:5683/obs");
+  exchange.bindProperty(object, "lamp");
    // when remote resource changed, lamp property will be updated
    // type will be automatically casted to property type (QTime in this case)
   ```
   * Two-way (observe and fire updates)
   ```cpp
-  CoapResource resource("coap://vs0.inf.ethz.ch:5683/obs");
-  resource.bindProperty(object, "lamp", CoapResource::TwoWay);
+  CoapExchange exchange("coap://vs0.inf.ethz.ch:5683/obs");
+  exchange.bindProperty(object, "lamp", CoapResource::TwoWay);
    // first, get request will be made and lamp property will be setted
    // next remote resource and property will be observed
    // when property will change, put request will be made
@@ -121,10 +132,10 @@ Below is a planned features list:
   Led {
    id: led
    Component.onCompleted: {
-    CoapResource resource
-    resource.bindProperty("coap://.../observable", led.on)
+    Coap.Exchange exchange
+    exchange.bindProperty("coap://.../observable", led.on)
     // or
-    resource.bindProperty("coap://.../observable", led.on, CoapResource.TwoWay)
+    exchange.bindProperty("coap://.../observable", led.on, CoapResource.TwoWay)
    }
   }
   ```
@@ -148,14 +159,14 @@ Below is a planned features list:
   // or
   exchange.get(CoapExchnage::File); // automatically save file contents to temp file
   // or
-  exchange.get(CoapExchange::File, [](CoapExchangeInfo info){}); // decide download file or not based on its size,name, etc
+  exchange.get(CoapExchange::File, [](CoapExchange &exchange){}); // decide download file or not based on its size,name, etc
   ```
   * Monitoring download progress (or any other exchange)
   ```cpp
   CoapExchange exchange("some url");
-  exchange.monitor([](CoapExchangeInfo info){});
+  exchange.monitor([](CoapExchange &info){});
   // or
-  exchange.monitor(object, SLOT(onExchangeStatusChanged(CoapExchangeInfo)));
+  exchange.monitor(object, SLOT(onExchangeStatusChanged(CoapExchange)));
   ```
 7. Discovery
   * Multicast based
@@ -209,3 +220,4 @@ CoapEndpoint in Client mode will check if there is such a proxy and pass every r
 11. HTTPS-CoAP proxy (configure existing)
 Mobile clients that cannot run CoAP can use HTTPS instead (for example Tizen Wearable), appropriate proxy configuration must be provided (with discovery and multicast requests support)
 Certificate provision must be supported.
+co
