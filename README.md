@@ -217,7 +217,8 @@ Below is a planned features list:
 10. Running many endpoints on one host (CoAP-CoAP proxy)
   If there is more than one multicast listener on one interface, only one of them will receive multicast packets (while everyone can still send them). So transparent CoAP-CoAP proxy is need, that will be launched as a daemon.
 CoapEndpoint in Client mode will check if there is such a proxy and pass every request through it. C/C++ CoAP implementation is more preferable in this case, maybe smcp, libcoap or some other?
-11. HTTPS-CoAP proxy (configure existing)
+11. HTTPS-CoAP, WebSockets-CoAP proxy (configure existing)
 Mobile clients that cannot run CoAP can use HTTPS instead (for example Tizen Wearable), appropriate proxy configuration must be provided (with discovery and multicast requests support)
 Certificate provision must be supported.
-co
+
+If app using coap:// scheme is running on a mobile platform outside private networks, transparent WebSockets-CoAP proxy may be used, without changing any logic. Call CoapEndpoint::translateRequestsToHttps("wss://ext-addr");
