@@ -1,0 +1,4 @@
+build/
+html/
+xml/
+doxygen_sqlite3.db

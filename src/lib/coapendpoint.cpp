@@ -54,7 +54,7 @@ void CoapEndpointPrivate::_q_error(QAbstractSocket::SocketError error)
 }
 
 
-CoapEndpoint::CoapEndpoint(const QString &endpointName, QObject *parent) :
+CoapEndpoint::CoapEndpoint(Type endpointType, const QString &endpointName, QObject *parent) :
     QObject(parent), d_ptr(new CoapEndpointPrivate)
 {
     qDebug() << "CoapEndpoint::CoapEndpoint(QObject *parent)";

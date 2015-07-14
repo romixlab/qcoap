@@ -11,7 +11,9 @@ SOURCES += \
     coap.cpp \
     coapendpoint.cpp \
     coappdu.cpp \
-    coapexchange.cpp
+    coapexchange.cpp \
+    coapendpointinfo.cpp \
+    coapexchangeparameters.cpp
 
 HEADERS += \
     coaplib_global.h \
@@ -20,7 +22,9 @@ HEADERS += \
     coapendpoint.h \
     coappdu.h \
     endianhelper.h \
-    coapexchange.h
+    coapexchange.h \
+    coapendpointinfo.h \
+    coapexchangeparameters.h
 
 unix {
     target.path = /usr/lib
