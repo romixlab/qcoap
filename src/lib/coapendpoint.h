@@ -3,13 +3,15 @@
 
 #include <QObject>
 #include <QHostAddress>
+#include <QNetworkInterface>
+#include <QUrl>
+
 #include "coaplib_global.h"
 #include "coapendpoint.h"
 #include "coapendpointinfo.h"
+#include "coapexchange.h"
 #include "coapexchangeparameters.h"
 #include "coappdu.h"
-#include <QHostAddress>
-#include <QUrl>
 
 class CoapEndpointPrivate;
 /** @file */
@@ -22,6 +24,14 @@ class COAPLIB_SHARED_EXPORT CoapEndpoint : public QObject
     Q_OBJECT
 public:
     /**
+     * @brief The Type enum
+     */
+    enum Type {
+        Client, /**< Run on ane free port available */
+        ClientServer /**< Run on 5683 port */
+    };
+
+    /**
      * @brief CoapEndpoint Initialize endpoint
      * @param endpointType Client or ClientServer @see Type
      * @param endpointName Name of this endpoint, useful when there is more that one endpoint
@@ -30,12 +40,14 @@ public:
      * CoapEndpointInfo::name() is in contrast used in communications with other CoAP nodes
      */
     CoapEndpoint(Type endpointType, const QString &endpointName = QStringLiteral("default"), QObject *parent = 0);
+
     /**
      * @brief ~CoapEndpoint Destroy everything and close sockets
      * If requestCertificate() was previously called, then before destroying multicast message is sended out,
      * to group provision, indicating that endpoint is shutting down
      */
     virtual ~CoapEndpoint();
+
     /**
      * @brief bind Bind on specific interface and port
      * @param address QHostAddress::LocalHost for example
@@ -53,15 +65,7 @@ public:
      * @return true on success
      * Note that enabling multicast without any protection is not recommended by RFC7252 11.3
      */
-    bool bindMulticast(const QHostAddress & groupAddress, const QNetworkInterface & iface);
-
-    /**
-     * @brief The Type enum
-     */
-    enum Type {
-        Client, /**< Run on ane free port available */
-        ClientServer /**< Run on 5683 port */
-    };
+    bool bindMulticast(const QHostAddress &groupAddress, const QNetworkInterface & iface);
 
     /**
      * @brief setEndpointInfo Provide an info about this endpoint
@@ -108,11 +112,14 @@ public:
      * @todo Such a proxy
      */
     void routeRequestsToProxy(const QUrl &proxyAddress);
+
+    friend class CoapExchange;
 protected:
     CoapEndpointPrivate * d_ptr;
     CoapEndpoint(CoapEndpointPrivate &dd, QObject *parent);
-
 private:
+    void addExchange(CoapExchange &exchange);
+
     Q_DECLARE_PRIVATE(CoapEndpoint)
     Q_PRIVATE_SLOT(d_func(), void _q_state_changed(QAbstractSocket::SocketState))
     Q_PRIVATE_SLOT(d_func(), void _q_ready_read())

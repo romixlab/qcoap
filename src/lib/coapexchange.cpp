@@ -2,44 +2,48 @@
 #include "coapexchange.h"
 #include "coapendpoint.h"
 
-class CoapExchangePrivate
+class CoapExchangePrivate : public QSharedData
 {
 public:
-    CoapEndpoint *endpoint;
-    QUrl uri;
+    CoapExchangePrivate()
+    {
 
+    }
+
+    CoapExchangePrivate(const CoapExchangePrivate &other) :
+        QSharedData(other)
+    {
+    }
+
+    ~CoapExchangePrivate()
+    {
+
+    }
+
+    CoapEndpoint *endpoint;
 };
 
-CoapExchange::CoapExchange(QObject *parent) :
-    QObject(parent), d_ptr(new CoapExchangePrivate)
+CoapExchange::CoapExchange() :
+    d(new CoapExchangePrivate)
 {
-    Q_D(CoapExchange);
     d->endpoint = Coap::defaultEndpoint();
+    d->endpoint->addExchange(*this);
 }
 
-CoapExchange::CoapExchange(CoapEndpoint *throughEndpoint, QObject *parent) :
-    QObject(parent), d_ptr(new CoapExchangePrivate)
+CoapExchange::CoapExchange(CoapEndpoint *throughEndpoint) :
+    d(new CoapExchangePrivate)
 {
-    Q_D(CoapExchange);
     d->endpoint = throughEndpoint;
 }
 
 CoapExchange::CoapExchange(const CoapExchange &other) :
-    d_ptr(other.d_ptr)
+    d(other.d)
 {
 }
 
-CoapExchange::~CoapExchange()
+CoapExchange &CoapExchange::operator =(const CoapExchange &other)
 {
-    if (d_ptr) {
-        delete d_ptr;
-        d_ptr = 0;
-    }
-}
-
-void CoapExchange::setUri(const QUrl &uri)
-{
-    Q_D(CoapExchange);
-    d->uri = uri;
+    d = other.d;
+    return *this;
 }
 

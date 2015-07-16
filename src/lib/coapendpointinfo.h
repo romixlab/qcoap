@@ -28,7 +28,7 @@ public:
      * @param endpointGroups
      */
     CoapEndpointInfo(const QString &endpointName,
-                     const QString &endpointGroups = QStringList());
+                     const QStringList &endpointGroups = QStringList());
     /**
      * @brief setName Set endpoint name visible from network
      * @param endpointName

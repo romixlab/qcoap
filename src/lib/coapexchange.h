@@ -2,28 +2,20 @@
 #define COAPEXCHANGE_H
 
 #include "coaplib_global.h"
-#include <QObject>
-#include <QUrl>
+#include <QExplicitlySharedDataPointer>
 
 class CoapEndpoint;
 class CoapExchangePrivate;
-class CoapExchange : public QObject
+class CoapExchange
 {
-    Q_OBJECT
 public:
-    CoapExchange(QObject *parent = 0);
-    CoapExchange(CoapEndpoint *throughEndpoint, QObject *parent = 0);
+    CoapExchange();
+    CoapExchange(CoapEndpoint *throughEndpoint);
     CoapExchange(const CoapExchange &other);
-    ~CoapExchange();
-
-    void setUri(const QUrl &uri);
-
-    void get();
-
+    CoapExchange &operator =(const CoapExchange &other);
 
 private:
-    CoapExchangePrivate *d_ptr;
-    Q_DECLARE_PRIVATE(CoapExchange)
+    QExplicitlySharedDataPointer<CoapExchangePrivate> d;
 };
 
 #endif // COAPEXCHANGE_H

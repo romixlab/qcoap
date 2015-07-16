@@ -26,5 +26,7 @@ public:
     QString name;
 
     CoapEndpoint *q_ptr;
+
+    QList<CoapExchange> exchanges;
 };
 #endif // COAPENDPOINT_P_H

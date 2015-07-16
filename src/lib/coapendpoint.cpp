@@ -3,6 +3,7 @@
 #include "coapendpoint.h"
 #include "coapendpoint_p.h"
 #include "coappdu.h"
+#include <QTimer>
 #include <QDebug>
 
 CoapEndpointPrivate::CoapEndpointPrivate()
@@ -44,7 +45,7 @@ void CoapEndpointPrivate::_q_ready_read()
         CoapPDU pdu;
         pdu.unpack(datagram);
         qDebug() << "_q_ready_read():" << datagram.toHex();
-        q->processPDU(pdu, from, fromPort);
+        //q->processPDU(pdu, from, fromPort);
     }
 }
 
@@ -75,41 +76,15 @@ CoapEndpoint::CoapEndpoint(CoapEndpointPrivate &dd, QObject *parent) :
 
 CoapEndpoint::~CoapEndpoint()
 {
-    Q_D(CoapEndpoint);
-    if (d) {
-        delete d;
+    if (d_ptr) {
+        delete d_ptr;
+        d_ptr = 0;
     }
 }
 
-
-bool CoapEndpoint::bind(const QHostAddress &address, quint16 port, Type type, quint16 maxAttempts)
+void CoapEndpoint::addExchange(CoapExchange &exchange)
 {
-    Q_D(CoapEndpoint);
-    if (d->udp->state() != QUdpSocket::UnconnectedState) {
-        qWarning() << "CoapEndpoint::bind(): socket already initialized";
-        return false;
-    }
-    if (type == ClientServer)
-        return d->udp->bind(address, port);
-    for (quint16 i = 0; i < maxAttempts; ++i)
-        if (d->udp->bind(address, port++))
-            return true;
-    return false;
-}
 
-void CoapEndpoint::processPDU(const CoapPDU &pdu, const QHostAddress &from,quint16 fromPort)
-{
-    Q_UNUSED(pdu);
-    Q_UNUSED(from);
-    Q_UNUSED(fromPort);
-}
-
-void CoapEndpoint::sendPDU(const CoapPDU &pdu, const QHostAddress &to, quint16 toPort)
-{
-    Q_D(CoapEndpoint);
-    QByteArray packed = pdu.pack();
-    qDebug() << "CoapEndpoint::sendPDU(): " << packed.toHex();
-    d->udp->writeDatagram(packed, to, toPort);
 }
 
 #include "moc_coapendpoint.cpp" // intentionally, for private slots to work
