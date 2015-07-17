@@ -14,6 +14,17 @@ public:
     CoapExchange(const CoapExchange &other);
     CoapExchange &operator =(const CoapExchange &other);
 
+    /**
+     * @brief get performs GET request
+     */
+    void get();
+
+    enum Status {
+        Invalid,
+        Completed,
+        TimedOut
+    };
+
 private:
     QExplicitlySharedDataPointer<CoapExchangePrivate> d;
 };

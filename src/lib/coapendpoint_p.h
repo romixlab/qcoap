@@ -28,5 +28,9 @@ public:
     CoapEndpoint *q_ptr;
 
     QList<CoapExchange> exchanges;
+
+    void test(){
+     qDebug() << "test called";
+    }
 };
 #endif // COAPENDPOINT_P_H
