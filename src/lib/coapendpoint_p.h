@@ -6,7 +6,7 @@
 #include "coapendpoint.h"
 
 class QUdpSocket;
-
+class CoapExchange;
 class CoapEndpointPrivate
 {
     Q_DECLARE_PUBLIC(CoapEndpoint)
@@ -19,18 +19,20 @@ public:
     void _q_ready_read();
     void _q_error(QAbstractSocket::SocketError error);
 
+    QByteArray generate_token();
+    void send_pdu(CoapExchange *exchange, CoapPDU *pdu);
+    void remove_exchange(CoapExchange *exchange); /// called from ~CoapExchange() only
+
     QHostAddress address;
     quint16 port;
     QUdpSocket *udp;
-
     QString name;
-
     CoapEndpoint *q_ptr;
+    quint16 currentMessageId;
 
-    QList<CoapExchange> exchanges;
+    QHash<QByteArray, CoapExchange *> token2exchange;
+    QHash<CoapExchange *, QByteArray> exchange2token;
 
-    void test(){
-     qDebug() << "test called";
-    }
+
 };
 #endif // COAPENDPOINT_P_H

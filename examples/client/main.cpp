@@ -1,5 +1,6 @@
 #include <QCoreApplication>
 #include <coapendpoint.h>
+#include <coapexchange.h>
 
 #include <QUrl>
 
@@ -57,16 +58,29 @@ int dumpPDU(const QByteArray &array)
     return 0;
 }
 
+void add()
+{
+    CoapExchange *exchange = new CoapExchange;
+    CoapUri uri;
+    uri.setHost(QHostAddress("134.102.218.16"));
+    uri.setPort(5683);
+    uri.setPath("test");
+    exchange->setUri(uri);
+    exchange->onCompleted([](){qDebug() << "Lambda!";});
+    exchange->get();
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-//    CoapEndpoint endpoint;
+    CoapEndpoint endpoint(CoapEndpoint::ClientServer);
+    endpoint.bind(QHostAddress::Any, 5683);
+
+    add();
 //    endpoint.bind(QHostAddress::LocalHost);
 
 //    qDebug() << Coap::defaultEndpoint();
-
-    qDebug()  << QUrl("coap://coap.me/%7Etest").toString();
 
     return a.exec();
 }

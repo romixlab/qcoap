@@ -9,10 +9,10 @@
 #include "coaplib_global.h"
 #include "coapendpoint.h"
 #include "coapendpointinfo.h"
-#include "coapexchange.h"
 #include "coapexchangeparameters.h"
 #include "coappdu.h"
 
+class CoapExchange;
 class CoapEndpointPrivate;
 /** @file */
 /**
@@ -114,12 +114,11 @@ public:
     void routeRequestsToProxy(const QUrl &proxyAddress);
 
     friend class CoapExchange;
+    friend class CoapExchangePrivate;
 protected:
     CoapEndpointPrivate * d_ptr;
     CoapEndpoint(CoapEndpointPrivate &dd, QObject *parent);
 private:
-    void addExchange(CoapExchange &exchange);
-
     Q_DECLARE_PRIVATE(CoapEndpoint)
     Q_PRIVATE_SLOT(d_func(), void _q_state_changed(QAbstractSocket::SocketState))
     Q_PRIVATE_SLOT(d_func(), void _q_ready_read())

@@ -1,8 +1,9 @@
 #ifndef COAP_H
 #define COAP_H
 
-#include "coaplib_global.h"
 #include <QString>
+
+#include "coaplib_global.h"
 
 class CoapEndpoint;
 class COAPLIB_SHARED_EXPORT Coap
