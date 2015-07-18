@@ -8,13 +8,12 @@
 
 CoapEndpointPrivate::CoapEndpointPrivate()
 {   
-    qDebug() << "CoapEndpointPrivate::CoapEndpointPrivate()";
+    currentMessageId = 0;
 }
 CoapEndpointPrivate::~CoapEndpointPrivate() {}
 
 void CoapEndpointPrivate::setup()
 {
-    qDebug() << "CoapEndpointPrivate::setup()";
     Q_Q(CoapEndpoint);
     udp = new QUdpSocket(q);
     QObject::connect(udp, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
@@ -34,7 +33,7 @@ void CoapEndpointPrivate::_q_state_changed(QAbstractSocket::SocketState state)
 
 void CoapEndpointPrivate::_q_ready_read()
 {
-    Q_Q(CoapEndpoint);
+    //Q_Q(CoapEndpoint);
     while (udp->hasPendingDatagrams()) {
         QByteArray datagram;
         datagram.resize(udp->pendingDatagramSize());
@@ -51,15 +50,29 @@ void CoapEndpointPrivate::_q_ready_read()
         }
         QByteArray token = pdu.token();
         CoapExchange *exchange = token2exchange.value(token, 0);
-        if (exchange) {
-            exchange->d->incoming_pdu(pdu);
+        if (!exchange) {
+            exchange = id2exchange.value(pdu.messageId(), 0);
+            if (exchange) {
+                qDebug() << "Found by id";
+                // id is changing from request to request, no need for this entry
+                id2exchange.remove(pdu.messageId());
+            } else {
+                qDebug() << "Strange message, RST it";
+                CoapPDU rst;
+                rst.setType(Coap::Type::RESET);
+                rst.setCode(Coap::Code::EMPTY);
+                rst.setMessageId(pdu.messageId());
+                udp->writeDatagram(rst.pack(), from, fromPort);
+                return;
+            }
         }
+        exchange->d->incoming_pdu(pdu);
     }
 }
 
 void CoapEndpointPrivate::_q_error(QAbstractSocket::SocketError error)
 {
-    qDebug() << error;
+    qDebug() << "Socket error" << error;
 }
 
 QByteArray CoapEndpointPrivate::generate_token()
@@ -75,7 +88,7 @@ QByteArray CoapEndpointPrivate::generate_token()
     return token;
 }
 
-void CoapEndpointPrivate::send_pdu(CoapExchange *exchange, CoapPDU *pdu)
+void CoapEndpointPrivate::send_pdu(CoapExchange *exchange, const CoapPDU &pdu)
 {
     QByteArray token;
     if (exchange2token.contains(exchange)) {
@@ -86,42 +99,52 @@ void CoapEndpointPrivate::send_pdu(CoapExchange *exchange, CoapPDU *pdu)
         exchange2token.insert(exchange, token);
     }
 
-    pdu->setToken(token);
+    CoapPDU pducopy = pdu;
+    pducopy.setToken(token);
     // set message id only if we are making request
-    if (    pdu->type() == Coap::Type::CONFIRMABLE ||
-            pdu->type() == Coap::Type::NON_CONFIRMABLE)
-        pdu->setMessageId(currentMessageId++);
+    if (    pducopy.type() == Coap::Type::CONFIRMABLE ||
+            pducopy.type() == Coap::Type::NON_CONFIRMABLE) {
+        quint16 id = currentMessageId++;
+        pducopy.setMessageId(id);
+        id2exchange.insert(id, exchange);
+    }
     CoapUri uri = exchange->uri();
-    udp->writeDatagram(pdu->pack(), uri.host(), uri.port());
+    udp->writeDatagram(pducopy.pack(), uri.host(), uri.port());
 }
 
 void CoapEndpointPrivate::remove_exchange(CoapExchange *exchange)
 {
+    qDebug() << "Deleting exchange from endpoint";
+    if (exchange->status() != CoapExchange::Completed)
+        qWarning() << "CoapExchange was destroyed before it's completion";
     QMutableHashIterator<QByteArray, CoapExchange *> it(token2exchange);
     while (it.hasNext()) {
         it.next();
-        if (it.value() == exchange) {
+        if (it.value() == exchange)
             it.remove();
-            qWarning() << "CoapExchange was destroyed before it's completion, "
-                          "use new and do not delete exchanges yourself";
-        }
+    }
+    exchange2token.remove(exchange);
+    QMutableHashIterator<quint16, CoapExchange *> it2(id2exchange);
+    while (it.hasNext()) {
+        it.next();
+        if (it.value() == exchange)
+            it.remove();
     }
 }
 
 CoapEndpoint::CoapEndpoint(Type endpointType, const QString &endpointName, QObject *parent) :
     QObject(parent), d_ptr(new CoapEndpointPrivate)
 {
-    qDebug() << "CoapEndpoint::CoapEndpoint(QObject *parent)";
     Q_D(CoapEndpoint);
     d->q_ptr = this;
     d->name = endpointName;
+    d->type = endpointType;
     d->setup();
 }
 
 CoapEndpoint::CoapEndpoint(CoapEndpointPrivate &dd, QObject *parent) :
     QObject(parent), d_ptr(&dd)
 {
-    qDebug() << "CoapEndpoint::CoapEndpoint(CoapEndpointPrivate &dd, QObject *parent)";
     Q_D(CoapEndpoint);
     d->q_ptr = this;
     d->setup();
@@ -129,6 +152,7 @@ CoapEndpoint::CoapEndpoint(CoapEndpointPrivate &dd, QObject *parent) :
 
 CoapEndpoint::~CoapEndpoint()
 {
+    qDebug() << "Endpoint deleted";
     if (d_ptr) {
         delete d_ptr;
         d_ptr = 0;
@@ -139,8 +163,18 @@ bool CoapEndpoint::bind(const QHostAddress &address, quint16 port)
 {
     Q_D(CoapEndpoint);
     d->address = address;
-    d->port = port;
-    return d->udp->bind(address, port);
+    if (d->type == Client) {
+        d->port = 42400;
+        while (!d->udp->bind(address, d->port))
+            d->port++;
+        return true;
+    } else {
+        if (port != 0)
+            d->port = port;
+        else
+            d->port = 5683;
+    }
+    return d->udp->bind(address, d->port);
 }
 
 #include "moc_coapendpoint.cpp" // intentionally, for private slots to work

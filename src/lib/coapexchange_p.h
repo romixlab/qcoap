@@ -6,9 +6,9 @@
 
 #include "coapexchange.h"
 #include "coapuri.h"
+#include "coappdu.h"
 
 class CoapEndpoint;
-class CoapPDU;
 class CoapExchangePrivate : public QSharedData
 {
 public:
@@ -22,9 +22,19 @@ public:
     CoapEndpoint *endpoint;
     CoapExchange::Status status;
     CoapUri uri;
-    QVector<CoapPDU *> pdus;
+    QVector<CoapPDU> pdus;
+
+    enum Flag {
+        Observe     = 1,
+    };
+    Q_DECLARE_FLAGS(Flags, Flag)
+    Flags flags;
+
+    quint32 timeout;
     std::function<void ()> on_completed;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(CoapExchangePrivate::Flags)
 
 #endif // COAP_EXCHANGE_P_H
 

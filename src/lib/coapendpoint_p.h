@@ -20,8 +20,14 @@ public:
     void _q_error(QAbstractSocket::SocketError error);
 
     QByteArray generate_token();
-    void send_pdu(CoapExchange *exchange, CoapPDU *pdu);
-    void remove_exchange(CoapExchange *exchange); /// called from ~CoapExchange() only
+    void send_pdu(CoapExchange *exchange, const CoapPDU &pdu);
+    /**
+     * @brief remove_exchange removes exchange from internal data structures
+     * @param exchange
+     * Called from ~CoapExchange().
+     * @todo Exchange inspection, smth like valgrind for exchanges
+     */
+    void remove_exchange(CoapExchange *exchange);
 
     QHostAddress address;
     quint16 port;
@@ -29,9 +35,11 @@ public:
     QString name;
     CoapEndpoint *q_ptr;
     quint16 currentMessageId;
+    CoapEndpoint::Type type;
 
-    QHash<QByteArray, CoapExchange *> token2exchange;
-    QHash<CoapExchange *, QByteArray> exchange2token;
+    QHash<QByteArray, CoapExchange *> token2exchange; // on pdu rx used to find exchange
+    QHash<CoapExchange *, QByteArray> exchange2token; // on pdu tx used to find token
+    QHash<quint16, CoapExchange *> id2exchange; // for separate answer without token
 
 
 };

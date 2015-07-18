@@ -3,6 +3,8 @@
 
 #include <QtGlobal>
 #include <QByteArray>
+#include <QSharedDataPointer>
+
 #include "coaplib_global.h"
 #include "coap.h"
 
@@ -28,6 +30,7 @@ public:
     CoapPDU();
     CoapPDU(const QByteArray &array);
     CoapPDU(const CoapPDU &other);
+    CoapPDU &operator =(const CoapPDU &other);
     ~CoapPDU();
 
     void setVersion(quint8 version);
@@ -46,7 +49,7 @@ public:
     void setMessageId(quint16 id);
     quint16 messageId() const;
 
-    void addOption(Coap::OptionType optionType, const QByteArray &data);
+    void addOption(Coap::OptionType optionType, const QByteArray &data = QByteArray());
     QList<CoapOption> options() const;
     int optionsCount() const;
     CoapOption option(int idx) const;
@@ -79,12 +82,10 @@ public:
     bool isValid() const;
     bool isNull() const;
 
-protected:
-    CoapPDUPrivate *d_ptr;
+
 private:
-    void detach();
+    QSharedDataPointer<CoapPDUPrivate> d;
     quint8 *pack_option(quint8 *p, quint16 optionNumber, const QByteArray &value, bool write) const;
-    Q_DECLARE_PRIVATE(CoapPDU)
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(CoapPDU::Errors)

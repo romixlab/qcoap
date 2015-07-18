@@ -10,13 +10,17 @@
 class CoapEndpoint;
 class CoapEndpointPrivate;
 class CoapExchangePrivate;
+class CoapPDU;
+/** @file */
+/**
+ * @brief The CoapExchange class
+ */
 class CoapExchange
 {
 public:
     CoapExchange();
     CoapExchange(CoapEndpoint *throughEndpoint);
-    CoapExchange(const CoapExchange &other);
-    CoapExchange &operator =(const CoapExchange &other);
+
     ~CoapExchange();
 
     /**
@@ -33,18 +37,51 @@ public:
      */
     void get();
 
-    enum Status {
-        Invalid,
-        InProgress,
-        Completed,
-        TimedOut
-    };
+    void observe();
+    void abort();
 
+    /**
+     * @brief The Status enum
+     */
+    enum Status {
+        Invalid,    ///< After creation
+        InProgress, ///< Performing request, observing
+        Completed,  ///< Answer received, or abort() called
+        TimedOut    ///< Host not answered even after retransmissions
+    };
+    /**
+     * @brief status
+     * @return status of this exchange
+     */
+    Status status() const;
+    /**
+     * @brief conversation returns all important PDU's
+     * @return
+     * For GET [ack pdu, answer pdu] or [ack pdu] if exchange is timed out
+     */
+    QVector<CoapPDU> conversation() const;
+    /**
+     * @brief lastPDU returns last PDU
+     * @return
+     * For GET reqeust this will be PDU with answer
+     */
+    CoapPDU lastPDU() const;
+    /**
+     * @brief answer returns last PDU payload
+     * @return lastPDU().payload()
+     */
+    QByteArray answer() const;
+    /**
+     * @brief onCompleted provides a way to monitor exchange status.
+     * @param lambda called when status is changed to Completed
+     */
     void onCompleted(std::function<void ()> lambda);
 
     friend class CoapEndpoint;
     friend class CoapEndpointPrivate;
 private:
+    CoapExchange(const CoapExchange &other);
+    CoapExchange &operator =(const CoapExchange &other);
     QExplicitlySharedDataPointer<CoapExchangePrivate> d;
 };
 
