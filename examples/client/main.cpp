@@ -3,6 +3,7 @@
 #include <coapexchange.h>
 
 #include <QUrl>
+#include "coaptimerqueue.h"
 
 int dumpPDU(const QByteArray &array)
 {
@@ -74,10 +75,11 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    CoapEndpoint endpoint(CoapEndpoint::ClientServer);
-    endpoint.bind(QHostAddress::Any, 5683);
+//    CoapEndpoint endpoint(CoapEndpoint::ClientServer);
+    CoapTimerQueue q;
+//    endpoint.bind(QHostAddress::Any, 5683);
 
-    add();
+//    add();
 //    endpoint.bind(QHostAddress::LocalHost);
 
 //    qDebug() << Coap::defaultEndpoint();

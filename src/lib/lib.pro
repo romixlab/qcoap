@@ -14,7 +14,8 @@ SOURCES += \
     coapexchange.cpp \
     coapendpointinfo.cpp \
     coapexchangeparameters.cpp \
-    coapuri.cpp
+    coapuri.cpp \
+    coaptimerqueue.cpp
 
 HEADERS += \
     coaplib_global.h \
@@ -27,7 +28,8 @@ HEADERS += \
     coapendpointinfo.h \
     coapexchangeparameters.h \
     coapuri.h \
-    coapexchange_p.h
+    coapexchange_p.h \
+    coaptimerqueue.h
 
 unix {
     target.path = /usr/lib
