@@ -6,15 +6,6 @@ Now it's a work in progress!
 Below is a planned features list:
 
 1. Requests
-  * Blocking call (waitForComplete())
-  ```cpp
-  CoapEndpoint *endpoint = new CoapEndpoint(CoapEndpoint::Client); // use free port
-  CoapExchange exchange("coap://coap.me/test");
-  exchange.get();
-  exchange.waitForComplete(); // default timeout
-  qDebug() << exchange.status(); // CoapRequest::Status::[Completed, TimedOut, ]
-  qDebug() << exchange.answer(); // CoapPDU
- ```
   * Lambda
   ```cpp
   exchange.setTimeout(5000);
