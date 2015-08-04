@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QHostAddress>
+
 #include "coapendpoint.h"
 
 class QUdpSocket;

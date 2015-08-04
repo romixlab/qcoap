@@ -1,10 +1,11 @@
 #include <QUdpSocket>
+#include <QTimer>
+#include <QDebug>
+
 #include "coap.h"
 #include "coapendpoint_p.h"
 #include "coapexchange_p.h"
 #include "coappdu.h"
-#include <QTimer>
-#include <QDebug>
 
 CoapEndpointPrivate::CoapEndpointPrivate()
 {   

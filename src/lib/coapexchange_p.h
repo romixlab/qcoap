@@ -1,8 +1,9 @@
 #ifndef COAP_EXCHANGE_P_H
 #define COAP_EXCHANGE_P_H
 
-#include <QSharedData>
 #include <functional>
+
+#include <QSharedData>
 
 #include "coapexchange.h"
 #include "coapuri.h"

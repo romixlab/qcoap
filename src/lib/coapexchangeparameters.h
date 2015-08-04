@@ -1,8 +1,9 @@
 #ifndef COAPEXCHANGEPARAMETERS_H
 #define COAPEXCHANGEPARAMETERS_H
 
-#include "coaplib_global.h"
 #include <QJsonObject>
+
+#include "coaplib_global.h"
 
 class COAPLIB_SHARED_EXPORT CoapExchangeParameters
 {

@@ -1,8 +1,9 @@
 #ifndef COAPENDPOINTINFO_H
 #define COAPENDPOINTINFO_H
 
-#include "coaplib_global.h"
 #include <QStringList>
+
+#include "coaplib_global.h"
 
 /**
  * @brief The CoapEndpointInfo class describes CoAP endpoint

@@ -1,6 +1,7 @@
-#include "coap.h"
 #include <QList>
 #include <QDebug>
+
+#include "coap.h"
 
 struct CoapPrivate {
     CoapPrivate() {}

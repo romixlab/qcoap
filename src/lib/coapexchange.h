@@ -1,8 +1,9 @@
 #ifndef COAPEXCHANGE_H
 #define COAPEXCHANGE_H
 
-#include <QExplicitlySharedDataPointer>
 #include <functional>
+
+#include <QExplicitlySharedDataPointer>
 
 #include "coaplib_global.h"
 #include "coapuri.h"
@@ -10,6 +11,7 @@
 class CoapEndpoint;
 class CoapEndpointPrivate;
 class CoapExchangePrivate;
+class CoapTimerQueue;
 class CoapPDU;
 /** @file */
 /**
@@ -79,6 +81,7 @@ public:
 
     friend class CoapEndpoint;
     friend class CoapEndpointPrivate;
+    friend class CoapTimerQueue;
 private:
     CoapExchange(const CoapExchange &other);
     CoapExchange &operator =(const CoapExchange &other);

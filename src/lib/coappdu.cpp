@@ -1,7 +1,8 @@
-#include "coappdu.h"
 #include <QAtomicInt>
-#include "endianhelper.h"
 #include <QDebug>
+
+#include "coappdu.h"
+#include "endianhelper.h"
 
 CoapOption::CoapOption() : m_type((Coap::OptionType)0) {}
 CoapOption::CoapOption(Coap::OptionType optionType, const QByteArray &data):
