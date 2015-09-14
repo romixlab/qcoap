@@ -3,8 +3,6 @@
 
 #include <functional>
 
-#include <QExplicitlySharedDataPointer>
-
 #include "coaplib_global.h"
 #include "coapuri.h"
 
@@ -17,11 +15,12 @@ class CoapPDU;
 /**
  * @brief The CoapExchange class
  */
-class CoapExchange
+class CoapExchange : public QObject
 {
+    Q_OBJECT
 public:
-    CoapExchange();
-    CoapExchange(CoapEndpoint *throughEndpoint);
+    CoapExchange(QObject *parent = 0);
+    CoapExchange(CoapEndpoint *throughEndpoint, QObject *parent = 0);
 
     ~CoapExchange();
 
@@ -78,14 +77,19 @@ public:
      * @param lambda called when status is changed to Completed
      */
     void onCompleted(std::function<void ()> lambda);
+    void onError(std::function<void ()> lambda);
+
+private slots:
+    void timeout();
+
+private:
+    CoapExchange(const CoapExchange &other);
+    CoapExchange &operator =(const CoapExchange &other);
+    CoapExchangePrivate *d;
 
     friend class CoapEndpoint;
     friend class CoapEndpointPrivate;
     friend class CoapTimerQueue;
-private:
-    CoapExchange(const CoapExchange &other);
-    CoapExchange &operator =(const CoapExchange &other);
-    QExplicitlySharedDataPointer<CoapExchangePrivate> d;
 };
 
 #endif // COAPEXCHANGE_H

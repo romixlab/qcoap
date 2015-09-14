@@ -4,8 +4,8 @@ QT       -= gui
 TARGET = qcoap
 TEMPLATE = lib
 DEFINES += MAKE_COAPLIB
-QMAKE_CXXFLAGS += -std=c++11
-DESTDIR = $$PWD/../../lib
+CONFIG += c++11
+DESTDIR = $$TOP_SRCDIR/bin
 
 SOURCES += \
     coap.cpp \

@@ -6,12 +6,7 @@
 #include "coapendpoint_p.h"
 
 CoapExchangePrivate::CoapExchangePrivate()
-    : flags(Flags(0)), timeout(10000)
-{
-}
-
-CoapExchangePrivate::CoapExchangePrivate(const CoapExchangePrivate &other) :
-    QSharedData(other)
+    : flags(Flags(0))
 {
 }
 
@@ -43,36 +38,28 @@ void CoapExchangePrivate::incoming_pdu(const CoapPDU &pdu)
         qDebug() << "Observed:" << pdu.payload();
     } else {
         status = CoapExchange::Completed;
+        endpoint->d_ptr->timerQueue.removeTimers(q);
         if (on_completed)
             on_completed();
+        q->deleteLater();
     }
 }
 
-CoapExchange::CoapExchange() :
-    d(new CoapExchangePrivate)
+
+CoapExchange::CoapExchange(QObject *parent) :
+    QObject(parent), d(new CoapExchangePrivate)
 {
     d->q = this;
     d->endpoint = Coap::defaultEndpoint();
     d->status = Invalid;
 }
 
-CoapExchange::CoapExchange(CoapEndpoint *throughEndpoint) :
-    d(new CoapExchangePrivate)
+CoapExchange::CoapExchange(CoapEndpoint *throughEndpoint, QObject *parent) :
+    QObject(parent), d(new CoapExchangePrivate)
 {
     d->q = this;
     d->endpoint = throughEndpoint;
     d->status = Invalid;
-}
-
-CoapExchange::CoapExchange(const CoapExchange &other) :
-    d(other.d)
-{
-}
-
-CoapExchange &CoapExchange::operator =(const CoapExchange &other)
-{
-    d = other.d;
-    return *this;
 }
 
 CoapExchange::~CoapExchange()
@@ -105,6 +92,23 @@ void CoapExchange::get()
     pdu.setType(Coap::Type::CONFIRMABLE);
     d->pdus.push_back(pdu);
     d->endpoint->d_ptr->send_pdu(this, pdu);
+    d->retransmitCount = 0;
+    d->endpoint->d_ptr->timerQueue.addTimer(2000, this, "timeout");
+}
+
+void CoapExchange::timeout()
+{
+    if (++d->retransmitCount == 4) {
+        if (d->on_error)
+            d->on_error();
+        deleteLater();
+        return;
+    }
+    d->endpoint->d_ptr->send_pdu(this, d->pdus[0]);
+    quint32 nextRetransmission = 1000 * (1 << d->retransmitCount);
+    nextRetransmission += rand() % 100;
+    qDebug() << "next retransmission in" << nextRetransmission;
+    d->endpoint->d_ptr->timerQueue.addTimer(nextRetransmission, this, "timeout");
 }
 
 void CoapExchange::observe()
@@ -156,4 +160,9 @@ QByteArray CoapExchange::answer() const
 void CoapExchange::onCompleted(std::function<void ()> lambda)
 {
     d->on_completed = lambda;
+}
+
+void CoapExchange::onError(std::function<void ()> lambda)
+{
+    d->on_error = lambda;
 }

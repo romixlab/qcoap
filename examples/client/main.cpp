@@ -63,11 +63,12 @@ void add()
 {
     CoapExchange *exchange = new CoapExchange;
     CoapUri uri;
-    uri.setHost(QHostAddress("134.102.218.16"));
+    uri.setHost(QHostAddress("127.0.0.1"));
     uri.setPort(5683);
-    uri.setPath("test");
+    uri.setPath("hello");
     exchange->setUri(uri);
-    exchange->onCompleted([](){qDebug() << "Lambda!";});
+    exchange->onCompleted([=](){qDebug() << "Answer:" << exchange->answer();});
+    exchange->onError([](){qDebug() << "Timeout";});
     exchange->get();
 }
 
@@ -75,9 +76,10 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-//    CoapEndpoint endpoint(CoapEndpoint::ClientServer);
-    CoapTimerQueue q;
-//    endpoint.bind(QHostAddress::Any, 5683);
+    CoapEndpoint endpoint(CoapEndpoint::ClientServer);
+    endpoint.bind(QHostAddress::Any, 5688);
+
+    add();
 
 //    add();
 //    endpoint.bind(QHostAddress::LocalHost);

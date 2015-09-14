@@ -11,10 +11,10 @@ TARGET = client
 CONFIG   += console
 CONFIG   -= app_bundle
 QMAKE_CXXFLAGS += -std=c++11
-DESTDIR = $$PWD/../../bin
+DESTDIR = $$TOP_SRCDIR/bin
 
-LIBS += -L"$$PWD/../../lib" -lqcoap
-INCLUDEPATH += $$PWD/../../src/lib
+LIBS += -L"$$TOP_SRCDIR/bin" -lqcoap
+INCLUDEPATH += $$TOP_SRCDIR/src/lib
 
 TEMPLATE = app
 

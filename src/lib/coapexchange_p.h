@@ -3,18 +3,15 @@
 
 #include <functional>
 
-#include <QSharedData>
-
 #include "coapexchange.h"
 #include "coapuri.h"
 #include "coappdu.h"
 
 class CoapEndpoint;
-class CoapExchangePrivate : public QSharedData
+class CoapExchangePrivate
 {
 public:
     CoapExchangePrivate();
-    CoapExchangePrivate(const CoapExchangePrivate &other);
     ~CoapExchangePrivate();
 
     void incoming_pdu(const CoapPDU &pdu);
@@ -24,6 +21,7 @@ public:
     CoapExchange::Status status;
     CoapUri uri;
     QVector<CoapPDU> pdus;
+    quint8 retransmitCount = 0;
 
     enum Flag {
         Observe     = 1,
@@ -31,8 +29,8 @@ public:
     Q_DECLARE_FLAGS(Flags, Flag)
     Flags flags;
 
-    quint32 timeout;
     std::function<void ()> on_completed;
+    std::function<void ()> on_error;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(CoapExchangePrivate::Flags)
