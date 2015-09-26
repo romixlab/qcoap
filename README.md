@@ -8,19 +8,20 @@ Below is a planned features list:
 1. Requests
   * Lambda
   ```cpp
-  exchange.setTimeout(5000);
-  exchange.onComplete([](CoapExchange &exchange){});
-  exchange.get();
+  CoapEndpoint endpoint(QHostAddress::Any); // client mode
+  CoapExchange *exchange = new CoapExchange; // will be deleted by endpoint
+  exchange->setTimeout(5000);
+  exchange->onComplete([](CoapExchange &exchange){});
+  exchange->get();
   ```
   * Qt Quick callback function (onComplete(function(){})
   ```qml
   CoapEndpoint {
       address: "0.0.0.0"
-      mode: CoapEndpoint.Client
   }
   Button {
       onClicked: {
-          Coap.Exchange exchange("coap://coap.me/test")
+          var exchange = Coap.Exchange("coap://coap.me/test")
           exchange.get().onComplete(function(var exchange) {
           })
           //or
@@ -31,30 +32,32 @@ Below is a planned features list:
 2. Observing a resource
   * Slot invocation on a resource change
   ```cpp
-  CoapExchange exchange;
-  exchange.observe("coap://...", object, SLOT(QString,QPoint)) // types dispatched on the fly
+  CoapEndpoint endpoint(QHostAddress::Any);
+  CoapExchange *exchange = new CoapExchange;
+  exchange->observe("coap://...", object, SLOT(QString,QPoint)) // types dispatched on the fly
   ```
   * Lambda
   ```cpp
-  exchange.observe("coap://...", [](QVariant value){}) // lambda's with different arguments?
+  exchange->observe("coap://...", [](QVariant value){}) // lambda's with different arguments?
   ```
   * Dynamic signal
   ```cpp
-  exchange.observe("coap://...", "mysignal(int,int,QString)")
-  connect(exchange.dq, SIGNAL(mysignal(int,int,QString)),
+  exchange->observe("coap://...", "mysignal(int,int,QString)")
+  connect(exchange->dq(), SIGNAL(mysignal(int,int,QString)),
           myobject,  SLOT(someslot(int,int,QString))); // types dispatched on the fly
-  // dq is DQObject - object for work with dynamic slots, signals, properties
+  // dq() returns DQObject - class for work with dynamic slots, signals, properties
   ```
   * QML
   ```qml
   Component.onCompleted: {
-   Coap.Exchange exchange;
+   var exchange = Coap.Exchange();
    exchange.observe("coap://...").onChanged(function(){})
   }
   ```
 3. Creating a simple resource
   * Publish Q_INVOKABLE method or slot as a resource
   ```cpp
+  CoapEndpoint endpoint(QHostAddress::Any, 5683); // server mode
   CoapResource resource("/");
   resource.onRequest(object, SLOT(status(QString))); // get, post, put supported
   // if only get/post/put is needed
@@ -70,7 +73,7 @@ Below is a planned features list:
   * QML
   ```qml
   Component.onCompleted: {
-   Coap.Resource resource("/qmlresource");
+   var resource = Coap.Resource("/qmlresource");
    resource.onRequest(function(){})
   }
   // or
@@ -78,15 +81,15 @@ Below is a planned features list:
    path: "/"
    onRequest: ...
    CoapResource {
-   path: "/test"
-   bindProperty: someObject.property
+     path: "/test"
+     bindProperty: someObject.property
    }
   }
   ```
 4. Creating a resource based on a property
   ```cpp
-  CoapResource resource("/lamp");
-  resource.bindProperty(object, "lamp"); // get, post, put, observe supported
+  CoapResource *resource = new CoapResource("/lamp");
+  resource.bindProperty(someqobject, "lamp"); // get, post, put, observe supported
   ```
   * QML
   ```qml
@@ -95,7 +98,7 @@ Below is a planned features list:
    checkable: true
    text: "Start"
    Component.onCompleted: {
-    CoapResource resource("/start")
+    var resource = Coap.Resource("/start")
     resource.bindProperty(startButton.checked)
    }
   }
@@ -103,9 +106,9 @@ Below is a planned features list:
 5. Binding remote resource to local property
   * Simple (only observe remote resource)
   ```cpp
-  CoapExchange exchange("coap://vs0.inf.ethz.ch:5683/obs");
-  exchange.bindProperty(object, "lamp");
-   // when remote resource changed, lamp property will be updated
+  CoapExchange *exchange = new CoapExchange("coap://vs0.inf.ethz.ch:5683/obs");
+  exchange->bindProperty(someqobject, "clock");
+   // when remote resource changed, clock property will be updated
    // type will be automatically casted to property type (QTime in this case)
   ```
   * Two-way (observe and fire updates)
@@ -116,14 +119,14 @@ Below is a planned features list:
    // next remote resource and property will be observed
    // when property will change, put request will be made
    // when resource will change, property will be updated
-   // endless loop of setting property-sending put-receiving update-setting property-etc is taken care of
+   // endless loop of setting property - sending put - receiving update - setting property - etc is taken care of
   ```
   * QML
   ```qml
   Led {
    id: led
    Component.onCompleted: {
-    Coap.Exchange exchange
+    var exchange = Coap.Exchange()
     exchange.bindProperty("coap://.../observable", led.on)
     // or
     exchange.bindProperty("coap://.../observable", led.on, CoapResource.TwoWay)
@@ -133,31 +136,31 @@ Below is a planned features list:
 6. File transfering
   * Create a resource that accepts incoming files
   ```cpp
-  CoapResource resource("/filesink");
-  resource.acceptFiles([](fileName, fileSize, CoapRequestInfo info){/*decide what to do with file*/});
+  CoapResource *resource = new CoapResource("/filesink");
+  resource->acceptFiles([](fileName, fileSize, CoapRequestInfo info){/*decide what to do with the file*/});
   ```
   * Creata a resource that serves files
   ```cpp
-  CoapResource resource("/file");
-  resource.bindFile("./somefile");
+  CoapResource *resource = new CoapResource("/file");
+  resource->bindFile("./somefile");
   // or
-  resource.bindDirectory("./files"); // every file in files dir will be published as /file/some/path/in/files_dir
+  resource->bindDirectory("./files"); // every file in files dir will be published as /file/some/path/in/files_dir
   ```
   * Downloading a file from resource
   ```cpp
-  CoapExchange exchange("coap://host/file");
-  exchange.get(); // normal processing, see p.1
+  CoapExchange *exchange = new CoapExchange("coap://host/file");
+  exchange->get(); // normal processing, see p.1
   // or
-  exchange.get(CoapExchnage::File); // automatically save file contents to temp file
+  exchange->get(CoapExchnage::File); // automatically save file contents to temporary file
   // or
-  exchange.get(CoapExchange::File, [](CoapExchange &exchange){}); // decide download file or not based on its size,name, etc
+  exchange->get(CoapExchange::File, [](CoapExchange &exchange){}); // decide download file or not based on its size,name, etc
   ```
   * Monitoring download progress (or any other exchange)
   ```cpp
-  CoapExchange exchange("some url");
-  exchange.monitor([](CoapExchange &info){});
+  CoapExchange *exchange = new CoapExchange("some url");
+  exchange->monitor([](CoapExchange &info){});
   // or
-  exchange.monitor(object, SLOT(onExchangeStatusChanged(CoapExchange)));
+  exchange->monitor(object, SLOT(onExchangeStatusChanged(CoapExchange*)));
   ```
 7. Discovery
   * Multicast based
@@ -177,15 +180,15 @@ Below is a planned features list:
   * DNS based
   ```cpp
   CoapDiscoverer discoverer(CoapDiscoverer::DNS);
-  // same API, if no there is no DNS restrictions to implement them?
+  // same API, if there is no DNS restrictions to implement them?
   ```
 8. Doing a multicast requests
   ```cpp
-  CoapExchange exchange("coap://239.0.0.1/test");
+  CoapExchange *exchange = new CoapExchange("coap://239.0.0.1/test");
   // same API, many answers
-  CoapExchange exchange("coap://[floor1]/test"); // make a request to every endpoint in floor1 group
-  CoapExchange exchange("coap://{lamp-*}/set?value=0"); // make a request to every lamp (regexp match)
-  CoapExchange exchange("coap://[floor1]{lamp-*}/set?value=0"); // group and name match
+  CoapExchange *exchange = new CoapExchange("coap://[floor1]/test"); // make a request to every endpoint in floor1 group
+  CoapExchange *exchange = new CoapExchange("coap://{lamp-*}/set?value=0"); // make a request to every lamp (regexp match)
+  CoapExchange *exchange = new CoapExchange("coap://[floor1]{lamp-*}/set?value=0"); // group and name match
   ```
 9. Securing via certificates
   * Manual way
@@ -204,10 +207,10 @@ Below is a planned features list:
   endpoint.setInfo(info);
   endpoint.receiveCertificate();
   ```
-  After receiveCertificate() is called, presence of certificate is checked, if there is no certificate, multicast request to group "provision" is maded, then admin will decide issue the certificate to specific endpoint or node. If certificate exists it will be loaded. What to do with keyPassphase?
+  After receiveCertificate() is called, presence of certificate is checked, if there is no certificate, multicast request to group "provision" is maded, then admin will decide issue the certificate to specific endpoint or not. If certificate exists it will be loaded. What to do with keyPassphase?
 10. Running many endpoints on one host (CoAP-CoAP proxy)
-  If there is more than one multicast listener on one interface, only one of them will receive multicast packets (while everyone can still send them). So transparent CoAP-CoAP proxy is need, that will be launched as a daemon.
-CoapEndpoint in Client mode will check if there is such a proxy and pass every request through it. C/C++ CoAP implementation is more preferable in this case, maybe smcp, libcoap or some other?
+  If there is more than one multicast listener on one interface, only one of them will receive multicast packets (while everyone can still send them). So transparent CoAP-CoAP proxy is needed, that will be launched as a daemon.
+CoapEndpoint in Client mode will check if there is such a proxy and pass every multicast request through it. C/C++ CoAP implementation is more preferable in this case, maybe smcp, libcoap or some other?
 11. HTTPS-CoAP, WebSockets-CoAP proxy (configure existing)
 Mobile clients that cannot run CoAP can use HTTPS instead (for example Tizen Wearable), appropriate proxy configuration must be provided (with discovery and multicast requests support)
 Certificate provision must be supported.

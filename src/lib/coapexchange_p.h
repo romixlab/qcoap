@@ -14,9 +14,10 @@ public:
     CoapExchangePrivate();
     virtual ~CoapExchangePrivate();
 
+    void incoming_pdu(const CoapPDU &pdu);
+
     CoapEndpoint *endpoint;
     CoapUri uri;
-
     CoapExchange *q_ptr;
 };
 

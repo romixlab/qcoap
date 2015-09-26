@@ -23,11 +23,11 @@ class CoapExchange : public QObject
 {
     Q_OBJECT
 public:
+<<<<<<< HEAD
     /**
      * @brief CoapExchange through default endpoint
      */
     CoapExchange(QObject *parent = 0);
-
     virtual ~CoapExchange();
     /**
      * @brief setUri setts uri of a resource(-s) we are going to talk to.

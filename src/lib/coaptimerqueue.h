@@ -1,6 +1,8 @@
 #ifndef COAPTIMERQUEUE_H
 #define COAPTIMERQUEUE_H
 
+#include <functional>
+
 #include <QObject>
 
 class CoapTimerQueuePrivate;
@@ -16,7 +18,8 @@ public:
      * @brief addTimer adds timer with msec timeout after current time
      * @param msec
      */
-    void addTimer(quint32 msec, quint8 id);
+    void addTimer(quint32 msec, QObject *receiver, const char *method);
+    void removeTimers(QObject *receiver);
 
 signals:
 

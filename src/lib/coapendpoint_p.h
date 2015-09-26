@@ -5,6 +5,7 @@
 #include <QHostAddress>
 
 #include "coapendpoint.h"
+#include "coaptimerqueue.h"
 
 class QUdpSocket;
 class CoapExchange;
@@ -37,6 +38,7 @@ public:
     CoapEndpoint *q_ptr;
     quint16 currentMessageId;
     CoapEndpoint::Type type;
+    CoapTimerQueue timerQueue;
 
     QHash<QByteArray, CoapExchange *> token2exchange; // on pdu rx used to find exchange
     QHash<CoapExchange *, QByteArray> exchange2token; // on pdu tx used to find token

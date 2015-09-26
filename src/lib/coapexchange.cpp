@@ -13,7 +13,7 @@ CoapExchangePrivate::~CoapExchangePrivate()
 }
 
 CoapExchange::CoapExchange(QObject *parent) :
-    QObject(parent), d_ptr(new CoapExchangePrivate)
+    QObject(parent), d(new CoapExchangePrivate)
 {
     Q_D(CoapExchange);
     d->q_ptr = this;
@@ -26,6 +26,14 @@ CoapExchange::CoapExchange(CoapExchangePrivate &dd, QObject *parent) :
     Q_D(CoapExchange);
     d->q_ptr = this;
     d->endpoint = Coap::defaultEndpoint();
+}
+
+CoapExchange::CoapExchange(CoapEndpoint *throughEndpoint, QObject *parent) :
+    QObject(parent), d(new CoapExchangePrivate)
+{
+    d->q = this;
+    d->endpoint = throughEndpoint;
+    d->status = Invalid;
 }
 
 CoapExchange::~CoapExchange()
@@ -44,14 +52,6 @@ CoapUri CoapExchange::uri() const
 {
     Q_D(const CoapExchange);
     return d->uri;
-}
-
-void CoapExchange::handle(const CoapPDU &pdu)
-{
-    Q_UNUSED(pdu);
-    CoapPDU rst;
-    rst.setCode(CoapPDU::Code::NotFound);
-    send(rst);
 }
 
 void CoapExchange::send(const CoapPDU &pdu)
