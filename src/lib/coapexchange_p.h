@@ -1,41 +1,24 @@
 #ifndef COAP_EXCHANGE_P_H
 #define COAP_EXCHANGE_P_H
 
-#include <functional>
-
-#include <QSharedData>
-
 #include "coapexchange.h"
 #include "coapuri.h"
-#include "coappdu.h"
+
+#include <functional>
 
 class CoapEndpoint;
-class CoapExchangePrivate : public QSharedData
+class CoapExchangePrivate
 {
+    Q_DECLARE_PUBLIC(CoapExchange)
 public:
     CoapExchangePrivate();
-    CoapExchangePrivate(const CoapExchangePrivate &other);
-    ~CoapExchangePrivate();
+    virtual ~CoapExchangePrivate();
 
-    void incoming_pdu(const CoapPDU &pdu);
-
-    CoapExchange *q;
     CoapEndpoint *endpoint;
-    CoapExchange::Status status;
     CoapUri uri;
-    QVector<CoapPDU> pdus;
 
-    enum Flag {
-        Observe     = 1,
-    };
-    Q_DECLARE_FLAGS(Flags, Flag)
-    Flags flags;
-
-    quint32 timeout;
-    std::function<void ()> on_completed;
+    CoapExchange *q_ptr;
 };
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(CoapExchangePrivate::Flags)
 
 #endif // COAP_EXCHANGE_P_H
 

@@ -8,28 +8,27 @@ QMAKE_CXXFLAGS += -std=c++11
 DESTDIR = $$PWD/../../lib
 
 SOURCES += \
-    coap.cpp \
-    coapendpoint.cpp \
     coappdu.cpp \
+    coap.cpp \
     coapexchange.cpp \
-    coapendpointinfo.cpp \
-    coapexchangeparameters.cpp \
     coapuri.cpp \
-    coaptimerqueue.cpp
+    coapendpoint.cpp \
+    coapexchangeparameters.cpp \
+    coaprequest.cpp
 
 HEADERS += \
     coaplib_global.h \
+    coappdu.h \
     coap.h \
+    coapexchange.h \
+    coapexchange_p.h \
+    coapuri.h \
     coapendpoint_p.h \
     coapendpoint.h \
-    coappdu.h \
-    endianhelper.h \
-    coapexchange.h \
-    coapendpointinfo.h \
     coapexchangeparameters.h \
-    coapuri.h \
-    coapexchange_p.h \
-    coaptimerqueue.h
+    coapendpointinfo.h \
+    coaprequest.h \
+    coaprequest_p.h
 
 unix {
     target.path = /usr/lib

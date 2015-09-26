@@ -1,16 +1,16 @@
 #ifndef COAPENDPOINT_H
 #define COAPENDPOINT_H
 
-#include <QObject>
-#include <QHostAddress>
-#include <QNetworkInterface>
-#include <QUrl>
-
 #include "coaplib_global.h"
 #include "coapendpoint.h"
 #include "coapendpointinfo.h"
 #include "coapexchangeparameters.h"
 #include "coappdu.h"
+
+#include <QObject>
+#include <QHostAddress>
+#include <QNetworkInterface>
+#include <QUrl>
 
 class CoapExchange;
 class CoapEndpointPrivate;

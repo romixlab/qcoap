@@ -44,7 +44,8 @@ void CoapEndpointPrivate::_q_ready_read()
                           &from, &fromPort);
         CoapPDU pdu;
         pdu.unpack(datagram);
-        qDebug() << "Processing incoming pdu:" << datagram.toHex();
+        //qDebug() << "Processing incoming pdu:" << datagram.toHex();
+        qDebug() << "rx pdu:" << pdu;
         if (!pdu.isValid()) {
             qDebug() << "Invalid";
             return;
@@ -60,14 +61,14 @@ void CoapEndpointPrivate::_q_ready_read()
             } else {
                 qDebug() << "Strange message, RST it";
                 CoapPDU rst;
-                rst.setType(Coap::Type::RESET);
-                rst.setCode(Coap::Code::EMPTY);
+                rst.setType(CoapPDU::Type::Reset);
+                rst.setCode(CoapPDU::Code::Empty);
                 rst.setMessageId(pdu.messageId());
                 udp->writeDatagram(rst.pack(), from, fromPort);
                 return;
             }
         }
-        exchange->d->incoming_pdu(pdu);
+        //exchange->d_ptr->incoming_pdu(pdu);
     }
 }
 
@@ -89,48 +90,49 @@ QByteArray CoapEndpointPrivate::generate_token()
     return token;
 }
 
-void CoapEndpointPrivate::send_pdu(CoapExchange *exchange, const CoapPDU &pdu)
+void CoapEndpointPrivate::send(CoapExchange *exchange, const CoapPDU &pdu)
 {
-    QByteArray token;
-    if (exchange2token.contains(exchange)) {
-        token = exchange2token[exchange];
-    } else {
-        token = generate_token();
-        token2exchange.insert(token, exchange);
-        exchange2token.insert(exchange, token);
-    }
+    if (pdu.isRequest()) {
+        if (  !(pdu.type() == CoapPDU::Type::Confirmable ||
+                pdu.type() == CoapPDU::Type::NonConfirmable)) {
+            qDebug() << "Can't make request with type" << pdu.type();
+            return;
+        }
 
-    CoapPDU pducopy = pdu;
-    pducopy.setToken(token);
-    // set message id only if we are making request
-    if (    pducopy.type() == Coap::Type::CONFIRMABLE ||
-            pducopy.type() == Coap::Type::NON_CONFIRMABLE) {
+        CoapPDU pducopy = pdu;
+
+        QByteArray token = generate_token();
+        token2exchange.insert(token, exchange);
+        pducopy.setToken(token);
+
         quint16 id = currentMessageId++;
         pducopy.setMessageId(id);
         id2exchange.insert(id, exchange);
+
+        CoapUri uri = exchange->uri();
+        udp->writeDatagram(pducopy.pack(), uri.host(), uri.port());
     }
-    CoapUri uri = exchange->uri();
-    udp->writeDatagram(pducopy.pack(), uri.host(), uri.port());
+
 }
 
 void CoapEndpointPrivate::remove_exchange(CoapExchange *exchange)
 {
-    qDebug() << "Deleting exchange from endpoint";
-    if (exchange->status() != CoapExchange::Completed)
-        qWarning() << "CoapExchange was destroyed before it's completion";
-    QMutableHashIterator<QByteArray, CoapExchange *> it(token2exchange);
-    while (it.hasNext()) {
-        it.next();
-        if (it.value() == exchange)
-            it.remove();
-    }
-    exchange2token.remove(exchange);
-    QMutableHashIterator<quint16, CoapExchange *> it2(id2exchange);
-    while (it.hasNext()) {
-        it.next();
-        if (it.value() == exchange)
-            it.remove();
-    }
+//    qDebug() << "Deleting exchange from endpoint";
+//    if (exchange->status() != CoapExchange::Completed)
+//        qWarning() << "CoapExchange was destroyed before it's completion";
+//    QMutableHashIterator<QByteArray, CoapExchange *> it(token2exchange);
+//    while (it.hasNext()) {
+//        it.next();
+//        if (it.value() == exchange)
+//            it.remove();
+//    }
+//    exchange2token.remove(exchange);
+//    QMutableHashIterator<quint16, CoapExchange *> it2(id2exchange);
+//    while (it.hasNext()) {
+//        it.next();
+//        if (it.value() == exchange)
+//            it.remove();
+//    }
 }
 
 CoapEndpoint::CoapEndpoint(Type endpointType, const QString &endpointName, QObject *parent) :

@@ -21,7 +21,7 @@ public:
     void _q_error(QAbstractSocket::SocketError error);
 
     QByteArray generate_token();
-    void send_pdu(CoapExchange *exchange, const CoapPDU &pdu);
+    void send(CoapExchange *exchange, const CoapPDU &pdu);
     /**
      * @brief remove_exchange removes exchange from internal data structures
      * @param exchange

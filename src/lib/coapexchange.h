@@ -1,11 +1,8 @@
 #ifndef COAPEXCHANGE_H
 #define COAPEXCHANGE_H
 
-#include <functional>
-
-#include <QExplicitlySharedDataPointer>
-
 #include "coaplib_global.h"
+#include "coappdu.h"
 #include "coapuri.h"
 
 class CoapEndpoint;
@@ -15,77 +12,67 @@ class CoapTimerQueue;
 class CoapPDU;
 /** @file */
 /**
- * @brief The CoapExchange class
+ * @brief The CoapExchange class represents a logical conversation between CoAP client and server.
+ * Logical means across different message id's and even tokens for block transfer.
+ * You can inherit this class and reimplement handle() method for full controll over exchange.
+ * @see Request
+ * @see LambdaRequest
+ * @see Observer
  */
-class CoapExchange
+class CoapExchange : public QObject
 {
+    Q_OBJECT
 public:
-    CoapExchange();
-    CoapExchange(CoapEndpoint *throughEndpoint);
-
-    ~CoapExchange();
-
     /**
-     * @brief setUri setts uri of a resource(-s) we are going to talk to
+     * @brief CoapExchange through default endpoint
+     */
+    CoapExchange(QObject *parent = 0);
+
+    virtual ~CoapExchange();
+    /**
+     * @brief setUri setts uri of a resource(-s) we are going to talk to.
      * @param uri contains host address, port, path and other data
      * @see CoapUri
      */
     void setUri(const CoapUri &uri);
-
+    /**
+     * @brief uri returns uri of a resource we are talking with.
+     * @return
+     */
     CoapUri uri() const;
 
+//    /**
+//     * @brief The Status enum
+//     */
+//    enum Status {
+//        Invalid,    ///< After creation
+//        InProgress, ///< Performing request, observing
+//        Completed,  ///< Answer received, or abort() called
+//        TimedOut    ///< Host not answered even after retransmissions
+//    };
+//    Q_ENUM(Status)
+//    /**
+//     * @brief status
+//     * @return status of this exchange
+//     */
+//    Status status() const;
+protected:
     /**
-     * @brief get performs GET request
+     * @brief handle is called when PDU, associated with this exchange arrives
+     * @param pdu
+     * Default implementation sends 4.04 Not Found error back and calls removeLater()
      */
-    void get();
+    virtual void handle(const CoapPDU &pdu);
+    /**
+     * @brief send sends pdu to remote server or client
+     * @param pdu
+     */
+    void send(const CoapPDU &pdu);
 
-    void observe();
-    void abort();
-
-    /**
-     * @brief The Status enum
-     */
-    enum Status {
-        Invalid,    ///< After creation
-        InProgress, ///< Performing request, observing
-        Completed,  ///< Answer received, or abort() called
-        TimedOut    ///< Host not answered even after retransmissions
-    };
-    /**
-     * @brief status
-     * @return status of this exchange
-     */
-    Status status() const;
-    /**
-     * @brief conversation returns all important PDU's
-     * @return
-     * For GET [ack pdu, answer pdu] or [ack pdu] if exchange is timed out
-     */
-    QVector<CoapPDU> conversation() const;
-    /**
-     * @brief lastPDU returns last PDU
-     * @return
-     * For GET reqeust this will be PDU with answer
-     */
-    CoapPDU lastPDU() const;
-    /**
-     * @brief answer returns last PDU payload
-     * @return lastPDU().payload()
-     */
-    QByteArray answer() const;
-    /**
-     * @brief onCompleted provides a way to monitor exchange status.
-     * @param lambda called when status is changed to Completed
-     */
-    void onCompleted(std::function<void ()> lambda);
-
-    friend class CoapEndpoint;
-    friend class CoapEndpointPrivate;
-    friend class CoapTimerQueue;
+    CoapExchange(CoapExchangePrivate &dd, QObject *parent = 0);
+    CoapExchangePrivate *d_ptr;
 private:
-    CoapExchange(const CoapExchange &other);
-    CoapExchange &operator =(const CoapExchange &other);
-    QExplicitlySharedDataPointer<CoapExchangePrivate> d;
+    Q_DECLARE_PRIVATE(CoapExchange)
 };
 
 #endif // COAPEXCHANGE_H

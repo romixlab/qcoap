@@ -1,15 +1,16 @@
-#include <QAtomicInt>
-#include <QDebug>
-
 #include "coappdu.h"
 #include "endianhelper.h"
 
-CoapOption::CoapOption() : m_type((Coap::OptionType)0) {}
-CoapOption::CoapOption(Coap::OptionType optionType, const QByteArray &data):
+#include <QAtomicInt>
+#include <QDebug>
+#include <QMetaEnum>
+
+CoapOption::CoapOption() : m_type((CoapPDU::OptionType)0) {}
+CoapOption::CoapOption(CoapPDU::OptionType optionType, const QByteArray &data):
     m_type(optionType), m_data(data)
 {}
 
-Coap::OptionType CoapOption::type() const
+CoapPDU::OptionType CoapOption::type() const
 {
     return m_type;
 }
@@ -34,8 +35,8 @@ class CoapPDUPrivate : public QSharedData
 public:
     CoapPDUPrivate() :
         version(1),
-        type(Coap::Type::RESET),
-        code(Coap::Code::EMPTY),
+        type(CoapPDU::Type::Reset),
+        code(CoapPDU::Code::Empty),
         message_id(0)
     {
         //@todo   d->errors =
@@ -57,8 +58,8 @@ public:
     { }
 
     quint8 version;
-    Coap::Type type;
-    Coap::Code code;
+    CoapPDU::Type type;
+    CoapPDU::Code code;
     quint16 message_id;
     QByteArray token;
     QList<CoapOption> options;
@@ -100,28 +101,38 @@ quint8 CoapPDU::version() const
     return d->version;
 }
 
-void CoapPDU::setType(Coap::Type type)
+void CoapPDU::setType(CoapPDU::Type type)
 {
     if (d->type == type)
         return;
     d->type = type;
 }
 
-Coap::Type CoapPDU::type() const
+CoapPDU::Type CoapPDU::type() const
 {
     return d->type;
 }
 
-void CoapPDU::setCode(Coap::Code code)
+void CoapPDU::setCode(CoapPDU::Code code)
 {
     if (d->code == code)
         return;
     d->code = code;
 }
 
-Coap::Code CoapPDU::code() const
+CoapPDU::Code CoapPDU::code() const
 {
     return d->code;
+}
+
+bool CoapPDU::isRequest() const
+{
+    return ((quint8)d->code >= 0x01 && (quint8)d->code <= 0x04);
+}
+
+bool CoapPDU::isResponse() const
+{
+
 }
 
 void CoapPDU::setToken(const QByteArray &token)
@@ -151,7 +162,7 @@ QByteArray CoapPDU::token() const
 void CoapPDU::setMessageId(quint16 id)
 {
     if (d->message_id == id)
-        return; 
+        return;
     d->message_id = id;
 }
 
@@ -160,7 +171,7 @@ quint16 CoapPDU::messageId() const
     return d->message_id;
 }
 
-void CoapPDU::addOption(Coap::OptionType optionType, const QByteArray &value)
+void CoapPDU::addOption(CoapPDU::OptionType optionType, const QByteArray &value)
 {
     int idx = 0;
     for (int i = 0; i < d->options.length(); ++i) {
@@ -190,10 +201,10 @@ CoapOption CoapPDU::option(int idx) const
     return d->options[idx];
 }
 
-void CoapPDU::setContentFormat(Coap::ContentFormat format)
+void CoapPDU::setContentFormat(CoapPDU::ContentFormat format)
 {
-    Coap::OptionType optionContentFormat = Coap::OptionType::CONTENT_FORMAT;
-    if (format == Coap::ContentFormat::TEXT_PLAIN) {
+    CoapPDU::OptionType optionContentFormat = OptionType::ContentFormat;
+    if (format == ContentFormat::TextPlain) {
         addOption(optionContentFormat, QByteArray());
     } else if ((quint16)format < 256) {
         quint8 f = (quint8)format;
@@ -317,9 +328,9 @@ void CoapPDU::unpack(const QByteArray &packed)
     if (d->version != 1)
         d->errors |= Error::UNKNOWN_VERSION;
 
-    d->type = (Coap::Type)( (p[0] & 0x30) >> 4 );
+    d->type = (CoapPDU::Type)( (p[0] & 0x30) >> 4 );
     quint8 tokenLength = (p[0] & 0xf);
-    d->code = (Coap::Code)p[1];
+    d->code = (CoapPDU::Code)p[1];
     if (tokenLength > 8)
         d->errors |= Error::WRONG_TOKEN_LENGTH;
     else
@@ -368,7 +379,7 @@ void CoapPDU::unpack(const QByteArray &packed)
         }
 
         optionNumber += optionDelta;
-        CoapOption option((Coap::OptionType)optionNumber, QByteArray((const char *)p, optionLength));
+        CoapOption option((CoapPDU::OptionType)optionNumber, QByteArray((const char *)p, optionLength));
         d->options.append(option);
         p += optionLength;
     } while (p <= pend);
@@ -385,4 +396,43 @@ CoapPDU::Errors CoapPDU::errors() const
 bool CoapPDU::isValid() const
 {
     return d->errors == Errors(0);
+}
+
+
+QDebug operator<<(QDebug debug, const CoapPDU &pdu)
+{
+    QDebugStateSaver saver(debug);
+    if (!pdu.isValid()) {
+        debug.nospace() << "CoapPDU(Invalid)";
+        return debug;
+    }
+    int typeEnum = pdu.staticMetaObject.indexOfEnumerator("Type");
+    int codeEnum = pdu.staticMetaObject.indexOfEnumerator("Code");
+    int optionTypeEnum = pdu.staticMetaObject.indexOfEnumerator("OptionType");
+    int contentFormatEnum = pdu.staticMetaObject.indexOfEnumerator("ContentFormat");
+    debug << "CoapPDU(" << pdu.staticMetaObject.enumerator(typeEnum).key((int)pdu.type());
+    debug << pdu.staticMetaObject.enumerator(codeEnum).key((int)pdu.code());
+    debug << pdu.staticMetaObject.enumerator(1).key(123);
+    debug << "token:" << pdu.token() << "mid:" << pdu.messageId();
+
+//    for (int i = 0; i < pdu.optionsCount(); ++i) {
+//        QDebug dbg(QtDebugMsg);
+//        dbg.nospace();
+//        dbg << "Option:" << i << ", ";
+//        CoapOption option = pdu.option(i);
+//        dbg << "isValid:" << option.isValid() << ", ";
+//        if (!option.isValid())
+//            continue;
+//        dbg << "Number:" << (int)option.type() << " - " << Coap::toString(option.type()) << ", ";
+//        dbg << "Data:" << option.data().toHex();
+//        //        if (option.type() == Coap::OptionType:: || option.type() == 3)
+//        dbg << " asString: " << option.data();
+//    }
+    if (pdu.payload().isEmpty())
+        debug << "no payload";
+    else
+        debug << "Payload: " << pdu.payload().toHex() << "asString" << pdu.payload();
+
+    debug << ")";
+    return debug;
 }
