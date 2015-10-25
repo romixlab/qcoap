@@ -125,6 +125,11 @@ CoapPDU::Code CoapPDU::code() const
     return d->code;
 }
 
+bool CoapPDU::isEmpty() const
+{
+    return d->code == Code::Empty;
+}
+
 bool CoapPDU::isRequest() const
 {
     return ((quint8)d->code >= 0x01 && (quint8)d->code <= 0x04);
@@ -132,7 +137,7 @@ bool CoapPDU::isRequest() const
 
 bool CoapPDU::isResponse() const
 {
-
+    return (!isEmpty() && !isRequest());
 }
 
 void CoapPDU::setToken(const QByteArray &token)

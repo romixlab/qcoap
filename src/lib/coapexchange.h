@@ -23,7 +23,6 @@ class CoapExchange : public QObject
 {
     Q_OBJECT
 public:
-<<<<<<< HEAD
     /**
      * @brief CoapExchange through default endpoint
      */
@@ -67,7 +66,7 @@ protected:
      * @brief send sends pdu to remote server or client
      * @param pdu
      */
-    void send(const CoapPDU &pdu);
+    void send(CoapPDU &message);
 
     CoapExchange(CoapExchangePrivate &dd, QObject *parent = 0);
     CoapExchangePrivate *d_ptr;

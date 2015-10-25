@@ -14,7 +14,9 @@ SOURCES += \
     coapuri.cpp \
     coapendpoint.cpp \
     coapexchangeparameters.cpp \
-    coaprequest.cpp
+    coaprequest.cpp \
+    stack/layerbase.cpp \
+    stack/udplayer.cpp
 
 HEADERS += \
     coaplib_global.h \
@@ -28,7 +30,9 @@ HEADERS += \
     coapexchangeparameters.h \
     coapendpointinfo.h \
     coaprequest.h \
-    coaprequest_p.h
+    coaprequest_p.h \
+    stack/layerbase.h \
+    stack/udplayer.h
 
 unix {
     target.path = /usr/lib

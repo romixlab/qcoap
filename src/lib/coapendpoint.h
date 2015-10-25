@@ -120,9 +120,6 @@ protected:
     CoapEndpoint(CoapEndpointPrivate &dd, QObject *parent);
 private:
     Q_DECLARE_PRIVATE(CoapEndpoint)
-    Q_PRIVATE_SLOT(d_func(), void _q_state_changed(QAbstractSocket::SocketState))
-    Q_PRIVATE_SLOT(d_func(), void _q_ready_read())
-    Q_PRIVATE_SLOT(d_func(), void _q_error(QAbstractSocket::SocketError))
 };
 
 #endif // COAPENDPOINT_H

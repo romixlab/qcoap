@@ -22,3 +22,8 @@ void CoapRequest::get()
     CoapExchange::send(pdu);
 }
 
+void CoapRequest::handle(const CoapPDU &message)
+{
+
+}
+

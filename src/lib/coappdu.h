@@ -100,6 +100,7 @@ public:
 
     void setCode(Code code);
     Code code() const;
+    bool isEmpty() const;
     bool isRequest() const;
     bool isResponse() const;
 
