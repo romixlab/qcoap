@@ -3,6 +3,7 @@
 
 #include "coapendpoint.h"
 #include "stack/udplayer.h"
+#include "stack/classifierlayer.h"
 
 #include <QObject>
 #include <QHostAddress>
@@ -20,6 +21,7 @@ public:
     void send(CoapExchange *exchange, CoapPDU &message);
 
     CoapEndpoint *q_ptr;
+    ClassifierLayer *classifierLayer;
     UDPLayer *udpLayer;
 };
 #endif // COAPENDPOINT_P_H

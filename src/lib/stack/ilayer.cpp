@@ -9,8 +9,8 @@ public:
     QUdpSocket *socket;
 };
 
-UDPLayer::UDPLayer(LayerBase *upper, QObject *parent) :
-    LayerBase(parent), d_ptr(new UDPLayerPrivate)
+UDPLayer::UDPLayer(ILayer *upper, QObject *parent) :
+    ILayer(parent), d_ptr(new UDPLayerPrivate)
 {
     setUpperLayer(upper);
     Q_D(UDPLayer);

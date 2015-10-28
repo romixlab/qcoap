@@ -16,7 +16,8 @@ SOURCES += \
     coapexchangeparameters.cpp \
     coaprequest.cpp \
     stack/layerbase.cpp \
-    stack/udplayer.cpp
+    stack/ilayer.cpp \
+    stack/classifierlayer.cpp
 
 HEADERS += \
     coaplib_global.h \
@@ -31,8 +32,9 @@ HEADERS += \
     coapendpointinfo.h \
     coaprequest.h \
     coaprequest_p.h \
-    stack/layerbase.h \
-    stack/udplayer.h
+    stack/udplayer.h \
+    stack/ilayer.h \
+    stack/classifierlayer.h
 
 unix {
     target.path = /usr/lib

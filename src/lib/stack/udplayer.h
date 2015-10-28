@@ -1,16 +1,16 @@
 #ifndef UDPLAYER_H
 #define UDPLAYER_H
 
-#include "layerbase.h"
+#include "ilayer.h"
 
 #include <QHostAddress>
 
 class UDPLayerPrivate;
-class UDPLayer : public LayerBase
+class UDPLayer : public ILayer
 {
     Q_OBJECT
 public:
-    UDPLayer(LayerBase *upper, QObject *parent);
+    UDPLayer(ILayer *upper, QObject *parent);
 
     void tx(CoapExchange *exchange, CoapPDU &message);
 

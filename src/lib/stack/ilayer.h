@@ -6,10 +6,10 @@
 #include <QObject>
 
 class CoapExchange;
-class LayerBase : public QObject
+class ILayer : public QObject
 {
 public:
-    LayerBase(QObject *parent = 0);
+    ILayer(QObject *parent = 0);
     /**
      * @brief tx towards network, pass to lower layers
      * @param exchange exchange that message belongs to
@@ -23,11 +23,11 @@ public:
      */
     virtual void rx(CoapExchange *exchange, CoapPDU &message);
 
-    void setUpperLayer(LayerBase *upper);
-    void setLowerLayer(LayerBase *lower);
+    void setUpperLayer(ILayer *upper);
+    void setLowerLayer(ILayer *lower);
 protected:
-    LayerBase *m_upper;
-    LayerBase *m_lower;
+    ILayer *m_upper;
+    ILayer *m_lower;
 };
 
 #endif // LAYERBASE_H

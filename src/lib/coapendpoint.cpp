@@ -17,26 +17,16 @@ void CoapEndpointPrivate::setup()
 {
     Q_Q(CoapEndpoint);
     Coap::addEndpoint(q);
+    classifierLayer = new ClassifierLayer(q);
     udpLayer = new UDPLayer(0, q);
+    classifierLayer->setLowerLayer(udpLayer);
+    udpLayer->setUpperLayer(classifierLayer);
 }
 
 void CoapEndpointPrivate::send(CoapExchange *exchange, CoapPDU &message)
 {
-    udpLayer->tx(exchange, message);
+    classifierLayer->tx(exchange, message);
 }
-
-//QByteArray CoapEndpointPrivate::generate_token()
-//{
-//    QByteArray token;
-//    /// @todo token size from config
-//    token.resize(2);
-//    do {
-//        quint8 *d = (quint8 *)token.data();
-//        for (int i = 0; i < token.size(); ++i)
-//            d[i] = rand() % 255;
-//    } while (token2exchange.contains(token));
-//    return token;
-//}
 
 CoapEndpoint::CoapEndpoint(Type endpointType, const QString &endpointName, QObject *parent) :
     QObject(parent), d_ptr(new CoapEndpointPrivate)

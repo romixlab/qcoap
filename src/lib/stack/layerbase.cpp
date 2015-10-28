@@ -1,27 +1,27 @@
-#include "layerbase.h"
+#include "ilayer.h"
 
-LayerBase::LayerBase(QObject *parent) :
+ILayer::ILayer(QObject *parent) :
     QObject(parent), m_upper(0), m_lower(0)
 { }
 
-void LayerBase::tx(CoapExchange *exchange, CoapPDU &message)
+void ILayer::tx(CoapExchange *exchange, CoapPDU &message)
 {
     if (m_lower)
         m_lower->tx(exchange, message);
 }
 
-void LayerBase::rx(CoapExchange *exchange, CoapPDU &message)
+void ILayer::rx(CoapExchange *exchange, CoapPDU &message)
 {
     if (m_upper)
         m_upper->rx(exchange, message);
 }
 
-void LayerBase::setUpperLayer(LayerBase *upper)
+void ILayer::setUpperLayer(ILayer *upper)
 {
     m_upper = upper;
 }
 
-void LayerBase::setLowerLayer(LayerBase *lower)
+void ILayer::setLowerLayer(ILayer *lower)
 {
     m_lower = lower;
 }
