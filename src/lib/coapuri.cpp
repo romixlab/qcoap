@@ -1,10 +1,13 @@
 #include "coapuri.h"
 
+#include <QRegularExpression>
+
 class CoapUriPrivate : public QSharedData
 {
 public:
     CoapUriPrivate()
     {
+        port = 0;
     }
 
     CoapUriPrivate(const CoapUriPrivate &other) :
@@ -26,6 +29,11 @@ CoapUri::CoapUri() :
 {  
 }
 
+CoapUri::CoapUri(const QString &fromString)
+{
+    QRegularExpression re("(coap|coaps)")
+}
+
 CoapUri::CoapUri(const CoapUri &other) :
     d(other.d)
 {
@@ -41,9 +49,9 @@ CoapUri::~CoapUri()
 {
 }
 
-void CoapUri::setHost(const QHostAddress &host)
+void CoapUri::setHost(const QHostAddress &address)
 {
-    d->host = host;
+    d->host = address;
 }
 
 QHostAddress CoapUri::host() const

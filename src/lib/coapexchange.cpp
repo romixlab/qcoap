@@ -12,6 +12,13 @@ CoapExchangePrivate::~CoapExchangePrivate()
 
 }
 
+void CoapExchangePrivate::setStatus(CoapExchange::Status status)
+{
+    Q_Q(CoapExchange);
+    status = status;
+    emit q->statusChanged();
+}
+
 CoapExchange::CoapExchange(QObject *parent) :
     QObject(parent), d_ptr(new CoapExchangePrivate)
 {
@@ -27,6 +34,8 @@ CoapExchange::CoapExchange(CoapExchangePrivate &dd, QObject *parent) :
     d->q_ptr = this;
     d->endpoint = Coap::defaultEndpoint();
 }
+
+
 
 //CoapExchange::CoapExchange(CoapEndpoint *throughEndpoint, QObject *parent) :
 //    QObject(parent), d(new CoapExchangePrivate)
@@ -46,6 +55,7 @@ void CoapExchange::setUri(const CoapUri &uri)
 {
     Q_D(CoapExchange);
     d->uri = uri;
+    emit uriChanged();
 }
 
 CoapUri CoapExchange::uri() const
@@ -54,9 +64,36 @@ CoapUri CoapExchange::uri() const
     return d->uri;
 }
 
+void CoapExchange::setUriString(const QString &uriString)
+{
+    Q_D(CoapExchange);
+    d->uri = CoapUri(uriString);
+}
+
+QString CoapExchange::uriString() const
+{
+    Q_D(const CoapExchange);
+    return "CoapUri()"; /// TODO make normal output
+}
+
+CoapExchange::Status CoapExchange::status() const
+{
+    Q_D(const CoapExchange);
+    return d->status;
+}
+
+void CoapExchange::get()
+{
+    CoapPDU pdu;
+    pdu.setCode(CoapPDU::Code::Get);
+    pdu.setType(CoapPDU::Type::Confirmable);
+    pdu.addOption(CoapPDU::OptionType::UriPath, "/");
+    send(pdu);
+}
+
 void CoapExchange::handle(const CoapPDU &pdu)
 {
-    qDebug() << "strange";
+    qDebug() << "CoapExchange::handle()" << pdu;
 }
 
 void CoapExchange::send(CoapPDU &message)

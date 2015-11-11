@@ -129,7 +129,13 @@ void ClassifierLayer::rxRequest(CoapExchange *exchange, CoapPDU &message)
 
 void ClassifierLayer::rxResponse(CoapExchange *exchange, CoapPDU &message)
 {
+    Q_D(ClassifierLayer);
 
+    exchange = d->exchangeByToken.value(message.token(), 0);
+    if (exchange) {
+        qDebug() << "found exchange" << exchange;
+        exchange->handle(message);
+    }
 }
 
 void ClassifierLayer::rxEmpty(CoapExchange *exchange, CoapPDU &message)

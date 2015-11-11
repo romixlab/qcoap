@@ -9,16 +9,21 @@
 class CoapUriPrivate;
 class COAPLIB_SHARED_EXPORT CoapUri
 {
+    Q_GADGET
+    Q_PROPERTY(quint16 port READ port WRITE setPort)
+    Q_PROPERTY(QString path READ path WRITE setPath)
+
 public:
     /**
      * @brief CoapUri construct an invalid uri
      */
     CoapUri();
+    CoapUri(const QString &fromString);
     CoapUri(const CoapUri &other);
     CoapUri &operator =(const CoapUri &other);
     ~CoapUri();
 
-    void setHost(const QHostAddress &host);
+    void setHost(const QHostAddress &address);
     QHostAddress host() const;
     void setPort(quint16 port);
     quint16 port() const;
@@ -28,5 +33,7 @@ public:
 private:
     QSharedDataPointer<CoapUriPrivate> d;
 };
+
+Q_DECLARE_METATYPE(CoapUri)
 
 #endif // COAPURI_H

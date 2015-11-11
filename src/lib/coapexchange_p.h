@@ -19,6 +19,9 @@ public:
     CoapEndpoint *endpoint;
     CoapUri uri;
     CoapExchange *q_ptr;
+
+    CoapExchange::Status status;
+    void setStatus(CoapExchange::Status status);
 };
 
 #endif // COAP_EXCHANGE_P_H

@@ -5,6 +5,7 @@
 #include "coappdu.h"
 #include "coapuri.h"
 
+class ClassifierLayer; // @TODO create Deliverer that will be on top of the stack instead
 class CoapEndpoint;
 class CoapEndpointPrivate;
 class CoapExchangePrivate;
@@ -14,14 +15,13 @@ class CoapPDU;
 /**
  * @brief The CoapExchange class represents a logical conversation between CoAP client and server.
  * Logical means across different message id's and even tokens for block transfer.
- * You can inherit this class and reimplement handle() method for full controll over exchange.
- * @see Request
- * @see LambdaRequest
- * @see Observer
  */
 class CoapExchange : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
+    Q_PROPERTY(QString uri READ uriString WRITE setUriString NOTIFY uriChanged)
+
 public:
     /**
      * @brief CoapExchange through default endpoint
@@ -39,27 +39,34 @@ public:
      * @return
      */
     CoapUri uri() const;
+    void setUriString(const QString &uriString);
+    QString uriString() const;
 
-//    /**
-//     * @brief The Status enum
-//     */
-//    enum Status {
-//        Invalid,    ///< After creation
-//        InProgress, ///< Performing request, observing
-//        Completed,  ///< Answer received, or abort() called
-//        TimedOut    ///< Host not answered even after retransmissions
-//    };
-//    Q_ENUM(Status)
-//    /**
-//     * @brief status
-//     * @return status of this exchange
-//     */
-//    Status status() const;
+    /**
+     * @brief The Status enum
+     */
+    enum Status {
+        Ready,    ///< After creation
+        InProgress, ///< Performing request, observing
+        Completed,  ///< Answer received, or abort() called
+        TimedOut    ///< Host not answered even after retransmissions
+    };
+    Q_ENUM(Status)
+    /**
+     * @brief status
+     * @return status of this exchange
+     */
+    Status status() const;
+
+    Q_INVOKABLE void get();
+
+signals:
+    void statusChanged();
+    void uriChanged();
 protected:
     /**
      * @brief handle is called when PDU, associated with this exchange arrives
      * @param pdu
-     * Default implementation sends 4.04 Not Found error back and calls removeLater()
      */
     virtual void handle(const CoapPDU &pdu);
     /**
@@ -72,6 +79,8 @@ protected:
     CoapExchangePrivate *d_ptr;
 private:
     Q_DECLARE_PRIVATE(CoapExchange)
+
+    friend class ClassifierLayer;
 };
 
 #endif // COAPEXCHANGE_H

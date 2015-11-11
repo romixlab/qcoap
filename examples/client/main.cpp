@@ -18,5 +18,7 @@ int main(int argc, char *argv[])
     req.setUri(uri);
     req.get();
 
+    qDebug() << req.status();
+
     return a.exec();
 }
