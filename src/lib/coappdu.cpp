@@ -407,8 +407,9 @@ bool CoapPDU::isValid() const
 QDebug operator<<(QDebug debug, const CoapPDU &pdu)
 {
     QDebugStateSaver saver(debug);
+    debug.nospace();
     if (!pdu.isValid()) {
-        debug.nospace() << "CoapPDU(Invalid)";
+        debug << "CoapPDU(Invalid)";
         return debug;
     }
     int typeEnum = pdu.staticMetaObject.indexOfEnumerator("Type");
@@ -416,9 +417,9 @@ QDebug operator<<(QDebug debug, const CoapPDU &pdu)
     int optionTypeEnum = pdu.staticMetaObject.indexOfEnumerator("OptionType");
     int contentFormatEnum = pdu.staticMetaObject.indexOfEnumerator("ContentFormat");
     debug << "CoapPDU(" << pdu.staticMetaObject.enumerator(typeEnum).key((int)pdu.type());
-    debug << pdu.staticMetaObject.enumerator(codeEnum).key((int)pdu.code());
-    debug << pdu.staticMetaObject.enumerator(1).key(123);
-    debug << "token:" << pdu.token() << "mid:" << pdu.messageId();
+    debug << pdu.staticMetaObject.enumerator(codeEnum).key((int)pdu.code()) << " ";
+    debug << pdu.staticMetaObject.enumerator(1).key(123) << " ";
+    debug << "Token:" << pdu.token().toHex() << " MID:" << pdu.messageId() << " ";
 
 //    for (int i = 0; i < pdu.optionsCount(); ++i) {
 //        QDebug dbg(QtDebugMsg);
@@ -434,9 +435,9 @@ QDebug operator<<(QDebug debug, const CoapPDU &pdu)
 //        dbg << " asString: " << option.data();
 //    }
     if (pdu.payload().isEmpty())
-        debug << "no payload";
+        debug << "No payload ";
     else
-        debug << "Payload: " << pdu.payload().toHex() << "asString" << pdu.payload();
+        debug << "Payload:" << pdu.payload().toHex() << " asString:" << pdu.payload();
 
     debug << ")";
     return debug;

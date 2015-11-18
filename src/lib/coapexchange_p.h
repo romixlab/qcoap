@@ -5,6 +5,7 @@
 #include "coapuri.h"
 
 #include <functional>
+#include <QJSValue>
 
 class CoapEndpoint;
 class CoapExchangePrivate
@@ -22,6 +23,11 @@ public:
 
     CoapExchange::Status status;
     void setStatus(CoapExchange::Status status);
+
+    QJSValue jsCompleted;
+    QJSValue jsTimedout;
+
+    bool isReady();
 };
 
 #endif // COAP_EXCHANGE_P_H

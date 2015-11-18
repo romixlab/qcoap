@@ -7,7 +7,7 @@ class CoapUriPrivate : public QSharedData
 public:
     CoapUriPrivate()
     {
-        port = 0;
+        port = 5683;
     }
 
     CoapUriPrivate(const CoapUriPrivate &other) :
@@ -29,9 +29,14 @@ CoapUri::CoapUri() :
 {  
 }
 
-CoapUri::CoapUri(const QString &fromString)
+CoapUri::CoapUri(const QString &fromString) :
+    d(new CoapUriPrivate)
 {
-    QRegularExpression re("(coap|coaps)")
+    QRegularExpression re(R"(^(coaps?:\/\/)?([^\/\s]+)(\/.*)?$)");
+    QRegularExpressionMatch match = re.match(fromString);
+    if (match.hasMatch()) {
+        d->host = QHostAddress(match.captured(2));
+    }
 }
 
 CoapUri::CoapUri(const CoapUri &other) :

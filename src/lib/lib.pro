@@ -1,4 +1,4 @@
-QT       += network
+QT       += network qml
 QT       -= gui
 
 TARGET = qcoap
@@ -17,7 +17,8 @@ SOURCES += \
     coaprequest.cpp \
     stack/layerbase.cpp \
     stack/ilayer.cpp \
-    stack/classifierlayer.cpp
+    stack/classifierlayer.cpp \
+    nodeswatcher.cpp
 
 HEADERS += \
     coaplib_global.h \
@@ -34,7 +35,8 @@ HEADERS += \
     coaprequest_p.h \
     stack/udplayer.h \
     stack/ilayer.h \
-    stack/classifierlayer.h
+    stack/classifierlayer.h \
+    nodeswatcher.h
 
 unix {
     target.path = /usr/lib

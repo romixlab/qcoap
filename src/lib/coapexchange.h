@@ -21,7 +21,6 @@ class CoapExchange : public QObject
     Q_OBJECT
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(QString uri READ uriString WRITE setUriString NOTIFY uriChanged)
-
 public:
     /**
      * @brief CoapExchange through default endpoint
@@ -60,9 +59,13 @@ public:
 
     Q_INVOKABLE void get();
 
+    Q_INVOKABLE void onCompleted(const QVariant &jsFunction);
+
+
 signals:
     void statusChanged();
     void uriChanged();
+    void completed();
 protected:
     /**
      * @brief handle is called when PDU, associated with this exchange arrives

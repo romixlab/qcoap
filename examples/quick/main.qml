@@ -10,8 +10,15 @@ ApplicationWindow {
     height: 480
     visible: true
 
+    NodesWatcher {
+        id: watcher
+    }
+
     CoapExchange {
         id: exchange
+        onCompleted: {
+            console.log("Signal completed")
+        }
     }
 
     Row {
@@ -24,12 +31,20 @@ ApplicationWindow {
 
         Button {
             onClicked: {
-                exchange.uri = "coap://127.0.0.1:5683/"
+                exchange.onCompleted(function(){console.log("JS completed")})
+                exchange.uri = "coap://127.0.0.1/"
                 exchange.get()
             }
 
             text: "GET"
         }
+
+
+    }
+
+    Component.onCompleted: {
+        watcher.watch("coap://127.0.0.1")
+        watcher.watch("coap://134.102.218.18")
     }
 
 
