@@ -7,18 +7,17 @@
 #include <QObject>
 #include <QByteArray>
 #include <QSharedDataPointer>
+#include <QHostAddress>
 
-struct CoapPDUPrivate;
+struct CoapMessagePrivate;
 class CoapOption;
-class COAPLIB_SHARED_EXPORT CoapPDU
+class COAPLIB_SHARED_EXPORT CoapMessage
 {
     Q_GADGET
 public:
-    CoapPDU();
-    CoapPDU(const QByteArray &array);
-    CoapPDU(const CoapPDU &other);
-    CoapPDU &operator =(const CoapPDU &other);
-    ~CoapPDU();
+    CoapMessage();
+    CoapMessage(const QByteArray &array);
+    ~CoapMessage();
 
     enum class Type : quint8 {
     Confirmable     = 0x00,
@@ -128,6 +127,12 @@ public:
     QByteArray pack() const;
     void unpack(const QByteArray &packed);
 
+    QHostAddress address() const;
+    void setAddress(const QHostAddress &address);
+
+    quint16 port() const;
+    void setPort(quint16 port);
+
     enum class Error {
         FORMAT_ERROR           = 1,
         UNKNOWN_VERSION        = 2,
@@ -139,33 +144,33 @@ public:
         WRONG_TOKEN            = 128,
     };
     Q_DECLARE_FLAGS(Errors, Error)
-    CoapPDU::Errors errors() const;
+    Errors errors() const;
     QString errorString() const;
     bool isValid() const;
     bool isNull() const;
 
 
 private:
-    QSharedDataPointer<CoapPDUPrivate> d;
-    quint8 *pack_option(quint8 *p, quint16 optionNumber, const QByteArray &value, bool write) const;
+    CoapMessagePrivate *d_ptr;
+    Q_DECLARE_PRIVATE(CoapMessage)
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(CoapPDU::Errors)
+Q_DECLARE_OPERATORS_FOR_FLAGS(CoapMessage::Errors)
 
 class COAPLIB_SHARED_EXPORT CoapOption {
 public:
     CoapOption();
-    CoapOption(CoapPDU::OptionType optionType, const QByteArray &data);
+    CoapOption(CoapMessage::OptionType optionType, const QByteArray &data);
 
-    CoapPDU::OptionType type() const;
+    CoapMessage::OptionType type() const;
     QByteArray data() const;
     bool isValid() const;
 
     bool operator ==(const CoapOption &other);
 private:
-    CoapPDU::OptionType m_type;
+    CoapMessage::OptionType m_type;
     QByteArray m_data;
 };
 
-QDebug operator<<(QDebug debug, const CoapPDU &pdu);
+QDebug operator<<(QDebug debug, const CoapMessage &message);
 
 #endif // COAP_PDU_H

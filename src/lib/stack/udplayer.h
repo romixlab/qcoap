@@ -10,9 +10,9 @@ class UDPLayer : public ILayer
 {
     Q_OBJECT
 public:
-    UDPLayer(ILayer *upper, QObject *parent);
+    UDPLayer(QObject *parent);
 
-    void tx(CoapExchange *exchange, CoapPDU &message);
+    void tx(CoapMessage *message);
 
     void bind(const QHostAddress &address, quint16 port);
 

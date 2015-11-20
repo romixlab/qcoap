@@ -5,7 +5,7 @@
 #include "coap.h"
 #include "coapendpoint_p.h"
 #include "coapexchange_p.h"
-#include "coappdu.h"
+#include "coapmessage.h"
 
 CoapEndpointPrivate::CoapEndpointPrivate()
 {   

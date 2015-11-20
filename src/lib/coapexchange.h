@@ -2,7 +2,7 @@
 #define COAPEXCHANGE_H
 
 #include "coaplib_global.h"
-#include "coappdu.h"
+#include "coapmessage.h"
 #include "coapuri.h"
 
 class ClassifierLayer; // @TODO create Deliverer that will be on top of the stack instead
@@ -71,12 +71,12 @@ protected:
      * @brief handle is called when PDU, associated with this exchange arrives
      * @param pdu
      */
-    virtual void handle(const CoapPDU &pdu);
+    virtual void handle(CoapMessage *message);
     /**
      * @brief send sends pdu to remote server or client
      * @param pdu
      */
-    void send(CoapPDU &message);
+    void send(CoapMessage *message);
 
     CoapExchange(CoapExchangePrivate &dd, QObject *parent = 0);
     CoapExchangePrivate *d_ptr;

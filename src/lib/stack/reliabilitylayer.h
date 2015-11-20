@@ -1,15 +1,15 @@
-#ifndef CLASSIFIERLAYER_H
-#define CLASSIFIERLAYER_H
+#ifndef RELIABILITYLAYER_H
+#define RELIABILITYLAYER_H
 
+#include "coaplib_global.h"
 #include "ilayer.h"
 
-class ClassifierLayerPrivate;
-class ClassifierLayer : public ILayer
+class ReliabilityLayerPrivate;
+class COAPLIB_SHARED_EXPORT ReliabilityLayer : public ILayer
 {
-    Q_OBJECT
 public:
-    ClassifierLayer(QObject *parent = 0);
-    ~ClassifierLayer();
+    ReliabilityLayer(QObject *parent = 0);
+    ~ReliabilityLayer();
 
     void txRequest(CoapMessage *request) Q_DECL_OVERRIDE;
     void txResponse(CoapMessage *response) Q_DECL_OVERRIDE;
@@ -20,8 +20,8 @@ public:
     void rxEmpty(CoapMessage *empty) Q_DECL_OVERRIDE;
 
 private:
-    ClassifierLayerPrivate *d_ptr;
-    Q_DECLARE_PRIVATE(ClassifierLayer)
+    ReliabilityLayerPrivate *d_ptr;
+    Q_DECLARE_PRIVATE(ReliabilityLayer)
 };
 
-#endif // CLASSIFIERLAYER_H
+#endif // RELIABILITYLAYER_H

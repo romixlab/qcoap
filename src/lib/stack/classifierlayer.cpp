@@ -1,39 +1,9 @@
 #include "classifierlayer.h"
 
+#include "midaddressportkey.h"
 #include "coapexchange.h"
 
 #include <QHostAddress>
-
-class MidAddressPortKey
-{
-public:
-    MidAddressPortKey(quint32 messageId,
-                      const QHostAddress &address = QHostAddress(),
-                      quint16 port = 0) :
-        m_messageId(messageId), m_address(address), m_port(port)
-    { }
-
-
-private:
-    quint32 m_messageId;
-    QHostAddress m_address;
-    quint16 m_port;
-
-    friend bool operator==(const MidAddressPortKey &m1, const MidAddressPortKey &m2);
-    friend inline uint qHash(const MidAddressPortKey &key, uint seed);
-};
-
-inline bool operator==(const MidAddressPortKey &m1, const MidAddressPortKey &m2)
-{
-    return (m1.m_messageId == m2.m_messageId) &&
-           (m1.m_address   == m2.m_address) &&
-           (m1.m_port      == m2.m_port);
-}
-
-inline uint qHash(const MidAddressPortKey &key, uint seed)
-{
-    return qHash(key.m_address, seed) ^ key.m_messageId ^ key.m_port;
-}
 
 class ClassifierLayerPrivate
 {
@@ -70,16 +40,6 @@ ClassifierLayer::~ClassifierLayer()
     delete d_ptr;
 }
 
-void ClassifierLayer::tx(CoapExchange *exchange, CoapPDU &message)
-{
-    if (message.isRequest())
-        txRequest(exchange, message);
-    else if (message.isResponse())
-        txResponse(exchange, message);
-    else
-        txEmpty(exchange, message);
-}
-
 void ClassifierLayer::txRequest(CoapExchange *exchange, CoapPDU &message)
 {
     Q_D(ClassifierLayer);
@@ -110,16 +70,6 @@ void ClassifierLayer::txResponse(CoapExchange *exchange, CoapPDU &message)
 void ClassifierLayer::txEmpty(CoapExchange *exchange, CoapPDU &message)
 {
 
-}
-
-void ClassifierLayer::rx(CoapExchange *exchange, CoapPDU &message)
-{
-    if (message.isRequest())
-        rxRequest(exchange, message);
-    else if (message.isResponse())
-        rxResponse(exchange, message);
-    else
-        rxEmpty(exchange, message);
 }
 
 void ClassifierLayer::rxRequest(CoapExchange *exchange, CoapPDU &message)

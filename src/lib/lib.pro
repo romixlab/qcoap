@@ -8,21 +8,21 @@ CONFIG += c++11
 DESTDIR = $$TOP_SRCDIR/bin
 
 SOURCES += \
-    coappdu.cpp \
     coap.cpp \
     coapexchange.cpp \
     coapuri.cpp \
     coapendpoint.cpp \
     coapexchangeparameters.cpp \
     coaprequest.cpp \
-    stack/layerbase.cpp \
-    stack/ilayer.cpp \
     stack/classifierlayer.cpp \
-    nodeswatcher.cpp
+    nodeswatcher.cpp \
+    stack/reliabilitylayer.cpp \
+    stack/udplayer.cpp \
+    stack/ilayer.cpp \
+    coapmessage.cpp
 
 HEADERS += \
     coaplib_global.h \
-    coappdu.h \
     coap.h \
     coapexchange.h \
     coapexchange_p.h \
@@ -36,7 +36,10 @@ HEADERS += \
     stack/udplayer.h \
     stack/ilayer.h \
     stack/classifierlayer.h \
-    nodeswatcher.h
+    nodeswatcher.h \
+    stack/reliabilitylayer.h \
+    stack/midaddressportkey.h \
+    coapmessage.h
 
 unix {
     target.path = /usr/lib

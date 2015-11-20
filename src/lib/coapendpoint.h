@@ -5,7 +5,7 @@
 #include "coapendpoint.h"
 #include "coapendpointinfo.h"
 #include "coapexchangeparameters.h"
-#include "coappdu.h"
+#include "coapmessage.h"
 
 #include <QObject>
 #include <QHostAddress>

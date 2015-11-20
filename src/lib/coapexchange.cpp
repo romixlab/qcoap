@@ -102,11 +102,11 @@ void CoapExchange::get()
         return;
     d->setStatus(InProgress);
 
-    CoapPDU pdu;
-    pdu.setCode(CoapPDU::Code::Get);
-    pdu.setType(CoapPDU::Type::Confirmable);
-    pdu.addOption(CoapPDU::OptionType::UriPath, "/");
-    send(pdu);
+    CoapMessage *get = new CoapMessage();
+    get->setCode(CoapPDU::Code::Get);
+    get->setType(CoapPDU::Type::Confirmable);
+    get->addOption(CoapPDU::OptionType::UriPath, "/");
+    send(get);
 }
 
 void CoapExchange::onCompleted(const QVariant &jsFunction)
@@ -115,10 +115,10 @@ void CoapExchange::onCompleted(const QVariant &jsFunction)
     d->jsCompleted = jsFunction.value<QJSValue>();
 }
 
-void CoapExchange::handle(const CoapPDU &pdu)
+void CoapExchange::handle(CoapMessage *message)
 {
     Q_D(CoapExchange);
-    if (pdu.code() == CoapPDU::Code::Content) {
+    if (message->code() == CoapMessage::Code::Content) {
         if (d->jsCompleted.isCallable())
             d->jsCompleted.call();
         //d->lambdaCompleted();
@@ -130,8 +130,8 @@ void CoapExchange::handle(const CoapPDU &pdu)
     }
 }
 
-void CoapExchange::send(CoapPDU &message)
+void CoapExchange::send(CoapMessage *message)
 {
     Q_D(CoapExchange);
-    d->endpoint->d_ptr->send(this, message);
+    d->endpoint->d_ptr->send(message);
 }
