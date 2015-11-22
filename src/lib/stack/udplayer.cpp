@@ -12,19 +12,18 @@ public:
 UDPLayer::UDPLayer(QObject *parent) :
     ILayer(parent), d_ptr(new UDPLayerPrivate)
 {
-    setUpperLayer(upper);
     Q_D(UDPLayer);
     d->socket = new QUdpSocket(parent);
     connect(d->socket, SIGNAL(readyRead()),
             this,      SLOT(onReadyRead()));
 }
 
-void UDPLayer::tx(CoapMessage *message)
+void UDPLayer::tx(CoapMessage &message)
 {
     Q_D(UDPLayer);
     QByteArray packed = message.pack();
-    qDebug() << "Sending datagram to" << message->address() << message->port();
-    d->socket->writeDatagram(packed, message->address(), message->port());
+    qDebug() << "Sending datagram to" << message.address() << message.port();
+    d->socket->writeDatagram(packed, message.address(), message.port());
 }
 
 void UDPLayer::bind(const QHostAddress &address, quint16 port)
@@ -59,12 +58,12 @@ void UDPLayer::onReadyRead()
         quint16 fromPort;
         d->socket->readDatagram(datagram.data(), datagram.size(),
                           &from, &fromPort);
-        CoapMessage *message = new CoapMessage;
-        message->unpack(datagram);
-        message->setAddress(from);
-        message->setPort(port);
-        qDebug() << "Processing incoming pdu from:" << from.toString() << pdu;
-        if (message->isValid())
+        CoapMessage message;
+        message.unpack(datagram);
+        message.setAddress(from);
+        message.setPort(fromPort);
+        qDebug() << "Processing incoming pdu from:" << from.toString() << message;
+        if (message.isValid())
             rx(message); // pass to upper level
     }
 }

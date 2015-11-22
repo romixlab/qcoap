@@ -71,12 +71,12 @@ protected:
      * @brief handle is called when PDU, associated with this exchange arrives
      * @param pdu
      */
-    virtual void handle(CoapMessage *message);
+    virtual void handle(CoapMessage &message);
     /**
      * @brief send sends pdu to remote server or client
      * @param pdu
      */
-    void send(CoapMessage *message);
+    void send(CoapMessage &message);
 
     CoapExchange(CoapExchangePrivate &dd, QObject *parent = 0);
     CoapExchangePrivate *d_ptr;

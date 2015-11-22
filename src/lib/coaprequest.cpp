@@ -18,7 +18,7 @@ void CoapRequest::get()
 
 }
 
-void CoapRequest::handle(const CoapPDU &message)
+void CoapRequest::handle(CoapMessage &message)
 {
     qDebug() << "CoapRequest handle()" << message;
 }

@@ -6,8 +6,7 @@ class ReliabilityLayerPrivate
 {
     Q_DECLARE_PUBLIC(ReliabilityLayer)
 public:
-    ReliabilityLayerPrivate(ReliabilityLayer *q) :
-        q_ptr(q)
+    ReliabilityLayerPrivate()
     { }
 
     ReliabilityLayer *q_ptr;
@@ -16,12 +15,43 @@ public:
 ReliabilityLayer::ReliabilityLayer(QObject *parent) :
     ILayer(parent), d_ptr(new ReliabilityLayerPrivate)
 {
+    Q_D(ReliabilityLayer);
+    d->q_ptr = this;
+}
+
+ReliabilityLayer::~ReliabilityLayer()
+{
+    delete d_ptr;
+}
+
+void ReliabilityLayer::txRequest(CoapMessage &message)
+{
+    if (message.type() == CoapMessage::Type::Confirmable) {
+
+    }
+}
+
+void ReliabilityLayer::txResponse(CoapMessage &response)
+{
 
 }
 
-void ReliabilityLayer::txRequest(CoapExchange *exchange, CoapPDU &message)
+void ReliabilityLayer::txEmpty(CoapMessage &empty)
 {
-    if (message.type() == CoapPDU::Type::Confirmable) {
 
-    }
+}
+
+void ReliabilityLayer::rxRequest(CoapMessage &request)
+{
+
+}
+
+void ReliabilityLayer::rxResponse(CoapMessage &response)
+{
+
+}
+
+void ReliabilityLayer::rxEmpty(CoapMessage &empty)
+{
+
 }

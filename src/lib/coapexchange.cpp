@@ -60,7 +60,7 @@ CoapExchange::CoapExchange(CoapExchangePrivate &dd, QObject *parent) :
 
 CoapExchange::~CoapExchange()
 {
-    Q_D(CoapExchange);
+    //Q_D(CoapExchange);
 //    d->endpoint->d_ptr->remove_exchange(this);
 }
 
@@ -85,8 +85,8 @@ void CoapExchange::setUriString(const QString &uriString)
 
 QString CoapExchange::uriString() const
 {
-    Q_D(const CoapExchange);
-    return "CoapUri()"; /// TODO make normal output
+    //Q_D(const CoapExchange);
+    return "CoapUri(TODO make normal output)"; /// TODO make normal output
 }
 
 CoapExchange::Status CoapExchange::status() const
@@ -102,10 +102,10 @@ void CoapExchange::get()
         return;
     d->setStatus(InProgress);
 
-    CoapMessage *get = new CoapMessage();
-    get->setCode(CoapPDU::Code::Get);
-    get->setType(CoapPDU::Type::Confirmable);
-    get->addOption(CoapPDU::OptionType::UriPath, "/");
+    CoapMessage get;
+    get.setCode(CoapMessage::Code::Get);
+    get.setType(CoapMessage::Type::Confirmable);
+    get.addOption(CoapMessage::OptionType::UriPath, "/");
     send(get);
 }
 
@@ -115,10 +115,10 @@ void CoapExchange::onCompleted(const QVariant &jsFunction)
     d->jsCompleted = jsFunction.value<QJSValue>();
 }
 
-void CoapExchange::handle(CoapMessage *message)
+void CoapExchange::handle(CoapMessage &message)
 {
     Q_D(CoapExchange);
-    if (message->code() == CoapMessage::Code::Content) {
+    if (message.code() == CoapMessage::Code::Content) {
         if (d->jsCompleted.isCallable())
             d->jsCompleted.call();
         //d->lambdaCompleted();
@@ -130,8 +130,8 @@ void CoapExchange::handle(CoapMessage *message)
     }
 }
 
-void CoapExchange::send(CoapMessage *message)
+void CoapExchange::send(CoapMessage &message)
 {
     Q_D(CoapExchange);
-    d->endpoint->d_ptr->send(message);
+    //d->endpoint->d_ptr->send(message);
 }

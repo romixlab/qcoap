@@ -9,16 +9,14 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    CoapEndpoint endpoint(CoapEndpoint::ClientServer);
-    endpoint.bind(QHostAddress::LocalHost, 5684);
-    CoapRequest req;
-    CoapUri uri;
-    uri.setHost(QHostAddress::LocalHost);
-    uri.setPort(5683);
-    req.setUri(uri);
-    req.get();
+CoapMessage m;
+m.setPayload("hello");
 
-    qDebug() << req.status();
+CoapMessage m2;
+m2 = m;
+qDebug() << m2.payload();
+m2.setPayload("hey");
+qDebug() << m.payload() << m2.payload();
 
     return a.exec();
 }

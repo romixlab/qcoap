@@ -9,7 +9,7 @@
 #include <QSharedDataPointer>
 #include <QHostAddress>
 
-struct CoapMessagePrivate;
+class CoapMessagePrivate;
 class CoapOption;
 class COAPLIB_SHARED_EXPORT CoapMessage
 {
@@ -17,6 +17,8 @@ class COAPLIB_SHARED_EXPORT CoapMessage
 public:
     CoapMessage();
     CoapMessage(const QByteArray &array);
+    CoapMessage(const CoapMessage &other);
+    CoapMessage &operator=(const CoapMessage &other);
     ~CoapMessage();
 
     enum class Type : quint8 {
@@ -151,8 +153,7 @@ public:
 
 
 private:
-    CoapMessagePrivate *d_ptr;
-    Q_DECLARE_PRIVATE(CoapMessage)
+    QExplicitlySharedDataPointer<CoapMessagePrivate> d;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(CoapMessage::Errors)
 

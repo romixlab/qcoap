@@ -40,55 +40,55 @@ ClassifierLayer::~ClassifierLayer()
     delete d_ptr;
 }
 
-void ClassifierLayer::txRequest(CoapExchange *exchange, CoapPDU &message)
+void ClassifierLayer::txRequest(CoapMessage &message)
 {
     Q_D(ClassifierLayer);
     if (message.messageId() == 0)
         message.setMessageId((d->currentMid++) % 65536);
 
     MidAddressPortKey midKey(message.messageId());
-    d->exchangeByMid.insert(midKey, exchange);
+    //d->exchangeByMid.insert(midKey, exchange);
 
     if (message.token().isEmpty()) {
         QByteArray token = d->generateToken();
         message.setToken(token);
-        d->exchangeByToken.insert(token, exchange);
+        //d->exchangeByToken.insert(token, exchange);
     } else {
         /// TODO ongoing exchanges may reuse token, don't show warning in this case
         if (d->exchangeByToken.contains(message.token()))
             qWarning() << "Token reusing" << message.token().toHex();
     }
 
-    m_lower->tx(exchange, message);
+    //m_lower->tx(exchange, message);
 }
 
-void ClassifierLayer::txResponse(CoapExchange *exchange, CoapPDU &message)
+void ClassifierLayer::txResponse(CoapMessage &message)
 {
 
 }
 
-void ClassifierLayer::txEmpty(CoapExchange *exchange, CoapPDU &message)
+void ClassifierLayer::txEmpty(CoapMessage &message)
 {
 
 }
 
-void ClassifierLayer::rxRequest(CoapExchange *exchange, CoapPDU &message)
+void ClassifierLayer::rxRequest(CoapMessage &message)
 {
 
 }
 
-void ClassifierLayer::rxResponse(CoapExchange *exchange, CoapPDU &message)
+void ClassifierLayer::rxResponse(CoapMessage &message)
 {
     Q_D(ClassifierLayer);
 
-    exchange = d->exchangeByToken.value(message.token(), 0);
-    if (exchange) {
-        qDebug() << "found exchange" << exchange;
-        exchange->handle(message);
-    }
+//    exchange = d->exchangeByToken.value(message.token(), 0);
+//    if (exchange) {
+//        qDebug() << "found exchange" << exchange;
+//        exchange->handle(message);
+//    }
 }
 
-void ClassifierLayer::rxEmpty(CoapExchange *exchange, CoapPDU &message)
+void ClassifierLayer::rxEmpty(CoapMessage &message)
 {
 
 }

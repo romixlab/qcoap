@@ -7,7 +7,7 @@ ILayer::ILayer(QObject *parent) :
 ILayer::~ILayer()
 { }
 
-void ILayer::tx(CoapMessage *message)
+void ILayer::tx(CoapMessage &message)
 {
     if (message.isRequest())
         txRequest(message);
@@ -17,25 +17,25 @@ void ILayer::tx(CoapMessage *message)
         txEmpty(message);
 }
 
-void ILayer::txRequest(CoapMessage *request)
+void ILayer::txRequest(CoapMessage &request)
 {
     if (m_lower)
-        m_lower->tx(message);
+        m_lower->tx(request);
 }
 
-void ILayer::txResponse(CoapMessage *response)
+void ILayer::txResponse(CoapMessage &response)
 {
     if (m_lower)
-        m_lower->tx(message);
+        m_lower->tx(response);
 }
 
-void ILayer::txEmpty(CoapMessage *empty)
+void ILayer::txEmpty(CoapMessage &empty)
 {
     if (m_lower)
-        m_lower->tx(message);
+        m_lower->tx(empty);
 }
 
-void ILayer::rx(CoapMessage *message)
+void ILayer::rx(CoapMessage &message)
 {
     if (message.isRequest())
         rxRequest(message);
@@ -45,22 +45,22 @@ void ILayer::rx(CoapMessage *message)
         rxEmpty(message);
 }
 
-void ILayer::rxRequest(CoapMessage *request)
+void ILayer::rxRequest(CoapMessage &request)
 {
     if (m_upper)
-        m_upper->rx(message);
+        m_upper->rx(request);
 }
 
-void ILayer::rxResponse(CoapMessage *response)
+void ILayer::rxResponse(CoapMessage &response)
 {
     if (m_upper)
-        m_upper->rx(message);
+        m_upper->rx(response);
 }
 
-void ILayer::rxEmpty(CoapMessage *empty)
+void ILayer::rxEmpty(CoapMessage &empty)
 {
     if (m_upper)
-        m_upper->rx(message);
+        m_upper->rx(empty);
 }
 
 void ILayer::setUpperLayer(ILayer *upper)

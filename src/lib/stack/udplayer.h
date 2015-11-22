@@ -12,7 +12,7 @@ class UDPLayer : public ILayer
 public:
     UDPLayer(QObject *parent);
 
-    void tx(CoapMessage *message);
+    void tx(CoapMessage &message);
 
     void bind(const QHostAddress &address, quint16 port);
 

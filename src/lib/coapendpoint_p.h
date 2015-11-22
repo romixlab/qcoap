@@ -18,7 +18,7 @@ public:
 
     void setup();
 
-    void send(CoapExchange *exchange, CoapPDU &message);
+    void send(CoapMessage &message);
 
     CoapEndpoint *q_ptr;
     ClassifierLayer *classifierLayer;

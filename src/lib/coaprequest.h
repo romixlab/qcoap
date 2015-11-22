@@ -12,7 +12,7 @@ public:
     void get();
 
 protected:
-    void handle(const CoapPDU &message) Q_DECL_OVERRIDE;
+    void handle(CoapMessage &message) Q_DECL_OVERRIDE;
 
 private:
     CoapRequest(CoapRequestPrivate &dd, QObject *parent = 0);

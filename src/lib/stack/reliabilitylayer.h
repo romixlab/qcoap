@@ -7,17 +7,18 @@
 class ReliabilityLayerPrivate;
 class COAPLIB_SHARED_EXPORT ReliabilityLayer : public ILayer
 {
+    Q_OBJECT
 public:
     ReliabilityLayer(QObject *parent = 0);
     ~ReliabilityLayer();
 
-    void txRequest(CoapMessage *request) Q_DECL_OVERRIDE;
-    void txResponse(CoapMessage *response) Q_DECL_OVERRIDE;
-    void txEmpty(CoapMessage *empty) Q_DECL_OVERRIDE;
+    void txRequest(CoapMessage &request) Q_DECL_OVERRIDE;
+    void txResponse(CoapMessage &response) Q_DECL_OVERRIDE;
+    void txEmpty(CoapMessage &empty) Q_DECL_OVERRIDE;
 
-    void rxRequest(CoapMessage *request) Q_DECL_OVERRIDE;
-    void rxResponse(CoapMessage *response) Q_DECL_OVERRIDE;
-    void rxEmpty(CoapMessage *empty) Q_DECL_OVERRIDE;
+    void rxRequest(CoapMessage &request) Q_DECL_OVERRIDE;
+    void rxResponse(CoapMessage &response) Q_DECL_OVERRIDE;
+    void rxEmpty(CoapMessage &empty) Q_DECL_OVERRIDE;
 
 private:
     ReliabilityLayerPrivate *d_ptr;

@@ -18,14 +18,14 @@ void CoapEndpointPrivate::setup()
     Q_Q(CoapEndpoint);
     Coap::addEndpoint(q);
     classifierLayer = new ClassifierLayer(q);
-    udpLayer = new UDPLayer(0, q);
+    udpLayer = new UDPLayer(q);
     classifierLayer->setLowerLayer(udpLayer);
     udpLayer->setUpperLayer(classifierLayer);
 }
 
-void CoapEndpointPrivate::send(CoapExchange *exchange, CoapPDU &message)
+void CoapEndpointPrivate::send(CoapMessage &message)
 {
-    classifierLayer->tx(exchange, message);
+    classifierLayer->tx(message);
 }
 
 CoapEndpoint::CoapEndpoint(Type endpointType, const QString &endpointName, QObject *parent) :
