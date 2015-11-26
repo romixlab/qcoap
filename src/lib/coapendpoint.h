@@ -22,14 +22,9 @@ class CoapEndpointPrivate;
 class COAPLIB_SHARED_EXPORT CoapEndpoint : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString interface READ interfaceString WRITE setInterfaceString NOTIFY interfaceChanged)
+    Q_PROPERTY(quint16 port READ port WRITE setPort NOTIFY portChanged)
 public:
-    /**
-     * @brief The Type enum
-     */
-    enum Type {
-        Client, /**< Run on ane free port available */
-        ClientServer /**< Run on 5683 port */
-    };
 
     /**
      * @brief CoapEndpoint Initialize endpoint
@@ -39,7 +34,7 @@ public:
      * Note that endpointName is used only to find this endpoint later by calling Coap::endpoint("name")
      * CoapEndpointInfo::name() is in contrast used in communications with other CoAP nodes
      */
-    CoapEndpoint(Type endpointType, const QString &endpointName = QStringLiteral("default"), QObject *parent = 0);
+    CoapEndpoint(QObject *parent = 0);
 
     /**
      * @brief ~CoapEndpoint Destroy everything and close sockets
@@ -56,7 +51,17 @@ public:
      * If port is 0 then 5683 will be used in a case of ClientServer mode and some free port in a case of Client mode.
      * Note that multicast interface is configured using @see bindMulticast method
      */
-    bool bind(const QHostAddress &address = QHostAddress::Any, quint16 port = 0);
+    bool bind(const QHostAddress &interace, quint16 port = 0);
+
+    Q_INVOKABLE bool bind();
+
+    QString interfaceString() const;
+    void setInterfaceString(const QString &interfaceString);
+    QHostAddress interface() const;
+    void setInterface(const QHostAddress &interface);
+
+    quint16 port() const;
+    void setPort(quint16 port);
 
     /**
      * @brief bindMulticast Bind for multicast exchanges
@@ -113,13 +118,20 @@ public:
      */
     void routeRequestsToProxy(const QUrl &proxyAddress);
 
-    friend class CoapExchange;
-    friend class CoapExchangePrivate;
+signals:
+    void interfaceChanged();
+    void portChanged();
+    void endpointTypeChanged();
+
 protected:
     CoapEndpointPrivate * d_ptr;
     CoapEndpoint(CoapEndpointPrivate &dd, QObject *parent);
 private:
     Q_DECLARE_PRIVATE(CoapEndpoint)
+    Q_PRIVATE_SLOT(d_func(), void _q_on_udp_ready_read())
+    Q_PRIVATE_SLOT(d_func(), void _q_on_timeout(const QByteArray &))
+    friend class CoapExchange;
+    friend class CoapExchangePrivate;
 };
 
 #endif // COAPENDPOINT_H

@@ -14,12 +14,9 @@ SOURCES += \
     coapendpoint.cpp \
     coapexchangeparameters.cpp \
     coaprequest.cpp \
-    stack/classifierlayer.cpp \
     nodeswatcher.cpp \
-    stack/reliabilitylayer.cpp \
-    stack/udplayer.cpp \
-    stack/ilayer.cpp \
-    coapmessage.cpp
+    coapmessage.cpp \
+    timerqueue.cpp
 
 HEADERS += \
     coaplib_global.h \
@@ -33,13 +30,9 @@ HEADERS += \
     coapendpointinfo.h \
     coaprequest.h \
     coaprequest_p.h \
-    stack/udplayer.h \
-    stack/ilayer.h \
-    stack/classifierlayer.h \
     nodeswatcher.h \
-    stack/reliabilitylayer.h \
-    stack/midaddressportkey.h \
-    coapmessage.h
+    coapmessage.h \
+    timerqueue.h
 
 unix {
     target.path = /usr/lib

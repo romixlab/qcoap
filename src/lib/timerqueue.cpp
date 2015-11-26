@@ -2,27 +2,26 @@
 #include <QDateTime>
 #include <QDebug>
 
-#include "coaptimerqueue.h"
+#include "timerqueue.h"
 
 typedef struct {
     QDateTime dt;
-    QObject *object;
-    const char *method;
+    QByteArray key;
 } coap_timer_t;
 
-class CoapTimerQueuePrivate {
+class TimerQueuePrivate {
 public:
     QBasicTimer timer;
     QList<coap_timer_t> queue;
 };
 
-CoapTimerQueue::CoapTimerQueue(QObject *parent) :
-    QObject(parent), d(new CoapTimerQueuePrivate)
+TimerQueue::TimerQueue(QObject *parent) :
+    QObject(parent), d(new TimerQueuePrivate)
 {
 
 }
 
-CoapTimerQueue::~CoapTimerQueue()
+TimerQueue::~TimerQueue()
 {
     if (d) {
         delete d;
@@ -30,7 +29,7 @@ CoapTimerQueue::~CoapTimerQueue()
     }
 }
 
-void CoapTimerQueue::addTimer(quint32 msec, QObject *receiver, const char *method)
+void TimerQueue::addTimer(quint32 msec, const QByteArray &key)
 {
     QDateTime dt = QDateTime::currentDateTime().addMSecs(msec);
     int idx = 0;
@@ -40,25 +39,38 @@ void CoapTimerQueue::addTimer(quint32 msec, QObject *receiver, const char *metho
         if (idx == d->queue.size() - 1)
             idx += 1; // after last one
     }
-    coap_timer_t timer{dt, receiver, method};
+    coap_timer_t timer{dt, key};
     d->queue.insert(idx, timer);
     if (idx == 0)
         d->timer.start(msec, this);
 }
 
-void CoapTimerQueue::removeTimers(QObject *receiver)
+void TimerQueue::removeTimer(const QByteArray &key)
 {
-    for (int i = 0; i < d->queue.size(); ++i)
-        if (d->queue[i].object == receiver)
-            d->queue[i].object = 0;
+    int i = 0;
+    for (; i < d->queue.size(); ++i)
+        if (d->queue[i].key == key)
+            break;
+    if (i == d->queue.size())
+        return;
+    if (i != 0) {
+        d->queue.removeAt(i);
+        return;
+    }
+    d->queue.pop_front();
+    if (d->queue.isEmpty()) {
+        d->timer.stop();
+    } else {
+        qint64 msec = QDateTime::currentDateTime().msecsTo(d->queue.front().dt);
+        d->timer.start(msec, this);
+    }
 }
 
-void CoapTimerQueue::timerEvent(QTimerEvent *e)
+void TimerQueue::timerEvent(QTimerEvent *e)
 {
     Q_UNUSED(e);
     coap_timer_t &timer = d->queue.front();
-    if (timer.object)
-        QMetaObject::invokeMethod(timer.object, timer.method);
+    emit timeout(timer.key);
     d->timer.stop();
     d->queue.pop_front();
     if (!d->queue.isEmpty()) {

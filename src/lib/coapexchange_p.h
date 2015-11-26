@@ -15,8 +15,6 @@ public:
     CoapExchangePrivate();
     virtual ~CoapExchangePrivate();
 
-    void incoming_pdu(const CoapPDU &pdu);
-
     CoapEndpoint *endpoint;
     CoapUri uri;
     CoapExchange *q_ptr;
@@ -25,7 +23,10 @@ public:
     void setStatus(CoapExchange::Status status);
 
     QJSValue jsCompleted;
-    QJSValue jsTimedout;
+    QJSValue jsTimeout;
+
+    quint8 retransmissionCount;
+    CoapMessage lastRequest;
 
     bool isReady();
 };

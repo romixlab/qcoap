@@ -1,0 +1,3 @@
+module CoAP
+plugin quickcoap
+

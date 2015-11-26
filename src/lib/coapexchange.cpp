@@ -106,6 +106,8 @@ void CoapExchange::get()
     get.setCode(CoapMessage::Code::Get);
     get.setType(CoapMessage::Type::Confirmable);
     get.addOption(CoapMessage::OptionType::UriPath, "/");
+    get.setAddress(d->uri.host());
+    get.setPort(d->uri.port());
     send(get);
 }
 
@@ -113,6 +115,12 @@ void CoapExchange::onCompleted(const QVariant &jsFunction)
 {
     Q_D(CoapExchange);
     d->jsCompleted = jsFunction.value<QJSValue>();
+}
+
+void CoapExchange::onTimeout(const QVariant &jsFunction)
+{
+    Q_D(CoapExchange);
+    d->jsTimeout = jsFunction.value<QJSValue>();
 }
 
 void CoapExchange::handle(CoapMessage &message)
@@ -130,8 +138,22 @@ void CoapExchange::handle(CoapMessage &message)
     }
 }
 
+void CoapExchange::handleError()
+{
+    Q_D(CoapExchange);
+    if (d->jsTimeout.isCallable())
+        d->jsTimeout.call();
+    emit timeout();
+}
+
 void CoapExchange::send(CoapMessage &message)
 {
     Q_D(CoapExchange);
-    //d->endpoint->d_ptr->send(message);
+    if (!d->endpoint) {
+        qWarning() << "Can't send a message without CoapEndpoint, create it first";
+        return;
+    }
+    if (message.isRequest())
+        d->lastRequest = message;
+    d->endpoint->d_ptr->tx(this, message);
 }

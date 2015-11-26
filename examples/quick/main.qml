@@ -10,8 +10,10 @@ ApplicationWindow {
     height: 480
     visible: true
 
-    NodesWatcher {
-        id: watcher
+    CoapEndpoint {
+//        interface: "localhost"
+        port: 5684
+        Component.onCompleted: bind()
     }
 
     CoapExchange {
@@ -32,6 +34,7 @@ ApplicationWindow {
         Button {
             onClicked: {
                 exchange.onCompleted(function(){console.log("JS completed")})
+                exchange.onTimeout(function(){console.log("JS Timeout")})
                 exchange.uri = "coap://127.0.0.1/"
                 exchange.get()
             }
@@ -42,10 +45,10 @@ ApplicationWindow {
 
     }
 
-    Component.onCompleted: {
-        watcher.watch("coap://127.0.0.1")
-        watcher.watch("coap://134.102.218.18")
-    }
+//    Component.onCompleted: {
+//        watcher.watch("coap://127.0.0.1")
+//        watcher.watch("coap://134.102.218.18")
+//    }
 
 
 }

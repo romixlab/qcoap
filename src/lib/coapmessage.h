@@ -153,7 +153,7 @@ public:
 
 
 private:
-    QExplicitlySharedDataPointer<CoapMessagePrivate> d;
+    QSharedDataPointer<CoapMessagePrivate> d;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(CoapMessage::Errors)
 

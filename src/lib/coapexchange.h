@@ -5,12 +5,9 @@
 #include "coapmessage.h"
 #include "coapuri.h"
 
-class ClassifierLayer; // @TODO create Deliverer that will be on top of the stack instead
 class CoapEndpoint;
 class CoapEndpointPrivate;
 class CoapExchangePrivate;
-class CoapTimerQueue;
-class CoapPDU;
 /** @file */
 /**
  * @brief The CoapExchange class represents a logical conversation between CoAP client and server.
@@ -60,18 +57,20 @@ public:
     Q_INVOKABLE void get();
 
     Q_INVOKABLE void onCompleted(const QVariant &jsFunction);
-
+    Q_INVOKABLE void onTimeout(const QVariant &jsFunction);
 
 signals:
     void statusChanged();
     void uriChanged();
     void completed();
+    void timeout();
 protected:
     /**
      * @brief handle is called when PDU, associated with this exchange arrives
      * @param pdu
      */
     virtual void handle(CoapMessage &message);
+    virtual void handleError();
     /**
      * @brief send sends pdu to remote server or client
      * @param pdu
@@ -83,7 +82,8 @@ protected:
 private:
     Q_DECLARE_PRIVATE(CoapExchange)
 
-    friend class ClassifierLayer;
+    friend class CoapEndpoint;
+    friend class CoapEndpointPrivate;
 };
 
 #endif // COAPEXCHANGE_H
