@@ -12,7 +12,7 @@ void QuickPlugin::registerTypes(const char *uri)
     Q_ASSERT(uri == QLatin1String("Coap"));
     qmlRegisterType<CoapExchange>(uri, 1, 0, "CoapExchange");
     qmlRegisterType<CoapEndpoint>(uri, 1, 0, "CoapEndpoint");
-    qmlRegisterSingletonType<ExchangeSingleton>(uri, 1, 0, "Exchange", &ExchangeSingleton::qmlInstance);
+    qmlRegisterSingletonType<ExchangeSingleton>(uri, 1, 0, "Coap", &ExchangeSingleton::qmlInstance);
 }
 
 

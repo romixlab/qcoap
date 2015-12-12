@@ -55,9 +55,19 @@ public:
     Status status() const;
 
     Q_INVOKABLE void get();
+    Q_INVOKABLE void observe();
+    Q_INVOKABLE void cancel();
+
 
     Q_INVOKABLE void onCompleted(const QVariant &jsFunction);
     Q_INVOKABLE void onTimeout(const QVariant &jsFunction);
+
+    /**
+     * @brief deleteAfterComplete controls lifetime of CoapExchange object.
+     * Call this function to automatically remove exchange after answer war received or timeout occured.
+     * Default value is false
+     */
+    void deleteAfterComplete();
 
 signals:
     void statusChanged();

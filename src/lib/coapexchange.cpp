@@ -6,7 +6,7 @@
 #include <QJSValue>
 
 CoapExchangePrivate::CoapExchangePrivate() :
-    status(CoapExchange::Ready)
+    status(CoapExchange::Ready), deleteAfterComplete(false), observe(false)
 {
 }
 
@@ -18,7 +18,7 @@ CoapExchangePrivate::~CoapExchangePrivate()
 void CoapExchangePrivate::setStatus(CoapExchange::Status status)
 {
     Q_Q(CoapExchange);
-    status = status;
+    this->status = status;
     emit q->statusChanged();
 }
 
@@ -38,6 +38,8 @@ CoapExchange::CoapExchange(QObject *parent) :
     Q_D(CoapExchange);
     d->q_ptr = this;
     d->endpoint = Coap::defaultEndpoint();
+    if (!parent)
+        setParent(d->endpoint);
 }
 
 CoapExchange::CoapExchange(CoapExchangePrivate &dd, QObject *parent) :
@@ -46,20 +48,15 @@ CoapExchange::CoapExchange(CoapExchangePrivate &dd, QObject *parent) :
     Q_D(CoapExchange);
     d->q_ptr = this;
     d->endpoint = Coap::defaultEndpoint();
+    if (!parent)
+        setParent(d->endpoint);
 }
-
-
-
-//CoapExchange::CoapExchange(CoapEndpoint *throughEndpoint, QObject *parent) :
-//    QObject(parent), d(new CoapExchangePrivate)
-//{
-//    d->q = this;
-//    d->endpoint = throughEndpoint;
-//    d->status = Invalid;
-//}
 
 CoapExchange::~CoapExchange()
 {
+    qDebug() << "Exchange to" << uriString() << "is destroyed";
+    if (d_ptr)
+        delete d_ptr;
     //Q_D(CoapExchange);
 //    d->endpoint->d_ptr->remove_exchange(this);
 }
@@ -105,10 +102,31 @@ void CoapExchange::get()
     CoapMessage get;
     get.setCode(CoapMessage::Code::Get);
     get.setType(CoapMessage::Type::Confirmable);
-    get.addOption(CoapMessage::OptionType::UriPath, "/");
-    get.setAddress(d->uri.host());
-    get.setPort(d->uri.port());
+    get.setUri(d->uri);
     send(get);
+}
+
+void CoapExchange::observe()
+{
+    Q_D(CoapExchange);
+    if (!d->isReady())
+        return;
+    d->setStatus(InProgress);
+    d->observe = true;
+
+    CoapMessage get;
+    get.setCode(CoapMessage::Code::Get);
+    get.setType(CoapMessage::Type::Confirmable);
+    get.addOption(CoapMessage::OptionType::Observe);
+    get.setUri(d->uri);
+    send(get);
+}
+
+void CoapExchange::cancel()
+{
+    Q_D(CoapExchange);
+    d->endpoint->d_ptr->removeExchange(this);
+    d->setStatus(Ready);
 }
 
 void CoapExchange::onCompleted(const QVariant &jsFunction)
@@ -123,6 +141,12 @@ void CoapExchange::onTimeout(const QVariant &jsFunction)
     d->jsTimeout = jsFunction.value<QJSValue>();
 }
 
+void CoapExchange::deleteAfterComplete()
+{
+    Q_D(CoapExchange);
+    d->deleteAfterComplete = true;
+}
+
 void CoapExchange::handle(CoapMessage &message)
 {
     Q_D(CoapExchange);
@@ -130,12 +154,19 @@ void CoapExchange::handle(CoapMessage &message)
         if (d->jsCompleted.isCallable())
             d->jsCompleted.call();
         //d->lambdaCompleted();
-        emit completed();
-        d->setStatus(Completed);
+        if (!d->observe) {
+            emit completed();
+            d->setStatus(Completed);
+        }
     } else {
-        emit completed();
-        d->setStatus(Completed);
+        if (!d->observe) {
+            emit completed();
+            d->setStatus(Completed);
+        }
     }
+
+    if (d->status == Completed && d->deleteAfterComplete)
+        deleteLater();
 }
 
 void CoapExchange::handleError()
@@ -144,6 +175,10 @@ void CoapExchange::handleError()
     if (d->jsTimeout.isCallable())
         d->jsTimeout.call();
     emit timeout();
+    d->setStatus(TimedOut);
+
+    if (d->deleteAfterComplete)
+        deleteLater();
 }
 
 void CoapExchange::send(CoapMessage &message)

@@ -28,6 +28,9 @@ public:
     quint8 retransmissionCount;
     CoapMessage lastRequest;
 
+    bool deleteAfterComplete;
+    bool observe;
+
     bool isReady();
 };
 

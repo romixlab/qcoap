@@ -1,10 +1,10 @@
 #ifndef COAPURI_H
 #define COAPURI_H
 
+#include "coaplib_global.h"
+
 #include <QHostAddress>
 #include <QSharedDataPointer>
-
-#include "coaplib_global.h"
 
 class CoapUriPrivate;
 class COAPLIB_SHARED_EXPORT CoapUri

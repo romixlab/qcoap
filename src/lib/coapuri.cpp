@@ -36,6 +36,7 @@ CoapUri::CoapUri(const QString &fromString) :
     QRegularExpressionMatch match = re.match(fromString);
     if (match.hasMatch()) {
         d->host = QHostAddress(match.captured(2));
+        d->path = match.captured(3);
     }
 }
 

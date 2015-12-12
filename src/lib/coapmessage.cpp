@@ -420,6 +420,14 @@ void CoapMessage::setPort(quint16 port)
     d->port = port;
 }
 
+void CoapMessage::setUri(const CoapUri &uri)
+{
+    d->address = uri.host();
+    d->port = uri.port();
+    foreach (const QString &path, uri.path().split("/", QString::SkipEmptyParts))
+        addOption(OptionType::UriPath, path.toUtf8());
+}
+
 CoapMessage::Errors CoapMessage::errors() const
 {
     return d->errors;

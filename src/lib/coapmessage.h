@@ -2,6 +2,7 @@
 #define COAP_PDU_H
 
 #include "coaplib_global.h"
+#include "coapuri.h"
 #include "coap.h"
 
 #include <QObject>
@@ -134,6 +135,8 @@ public:
 
     quint16 port() const;
     void setPort(quint16 port);
+
+    void setUri(const CoapUri &uri);
 
     enum class Error {
         FORMAT_ERROR           = 1,

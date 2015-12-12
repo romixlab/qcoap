@@ -101,7 +101,8 @@ void CoapEndpointPrivate::txResponse(CoapExchange *fromExchange, CoapMessage &re
 
 void CoapEndpointPrivate::txEmpty(CoapExchange *fromExchange, CoapMessage &empty)
 {
-
+    Q_UNUSED(fromExchange);
+    sendMessage(empty);
 }
 
 void CoapEndpointPrivate::sendMessage(CoapMessage &message)
@@ -147,11 +148,24 @@ void CoapEndpointPrivate::rxRequest(CoapMessage &request)
 
 void CoapEndpointPrivate::rxResponse(CoapMessage &response)
 {
+    if (response.type() == CoapMessage::Type::Reset) {
+        qDebug() << "Ignoring response with Type::Reset";
+        return;
+    }
     CoapExchange *exchange = exchangeByToken.value(response.token(), 0);
     if (exchange) {
         qDebug() << "found exchange" << exchange;
         timerQueue->removeTimer(response.token());
         exchange->handle(response);
+    } else {
+        qDebug() << "Strange or after observe response received, RST it";
+        CoapMessage rst;
+        rst.setAddress(response.address());
+        rst.setPort(response.port());
+        rst.setType(CoapMessage::Type::Reset);
+        rst.setToken(response.token());
+        rst.setMessageId(response.messageId());
+        tx(0, rst);
     }
 }
 

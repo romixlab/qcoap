@@ -17,7 +17,7 @@ QObject *ExchangeSingleton::qmlInstance(QQmlEngine *engine, QJSEngine *scriptEng
 CoapExchange *ExchangeSingleton::exchange() const
 {
     CoapExchange *exchange = new CoapExchange;
-    //exchange.removeWhenComplete();
+    exchange->deleteAfterComplete();
     return exchange;
 }
 

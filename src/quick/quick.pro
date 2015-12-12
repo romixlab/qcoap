@@ -3,7 +3,7 @@ TARGET = quickcoap
 QT += qml quick
 CONFIG += qt plugin
 QMAKE_CXXFLAGS += -std=c++11
-DESTDIR = $$TOP_SRCDIR/bin/CoAP
+DESTDIR = $$TOP_SRCDIR/bin/Coap
 LIBS += -L"$$TOP_SRCDIR/bin" -lqcoap
 INCLUDEPATH += $$TOP_SRCDIR/src/lib
 
