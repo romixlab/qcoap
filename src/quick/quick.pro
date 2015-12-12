@@ -12,10 +12,12 @@ uri = CoAP
 
 # Input
 SOURCES += \
-    quick_plugin.cpp
+    quick_plugin.cpp \
+    exchangesingleton.cpp
 
 HEADERS += \
-    quick_plugin.h
+    quick_plugin.h \
+    exchangesingleton.h
 
 DISTFILES = qmldir
 

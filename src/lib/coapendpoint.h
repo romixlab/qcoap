@@ -22,8 +22,8 @@ class CoapEndpointPrivate;
 class COAPLIB_SHARED_EXPORT CoapEndpoint : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString interface READ interfaceString WRITE setInterfaceString NOTIFY interfaceChanged)
-    Q_PROPERTY(quint16 port READ port WRITE setPort NOTIFY portChanged)
+    Q_PROPERTY(QString address READ interfaceString WRITE setInterfaceString NOTIFY interfaceChanged)
+    Q_PROPERTY(int port READ port WRITE setPort NOTIFY portChanged)
 public:
 
     /**
